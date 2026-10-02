@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mi Control Financiero - Colombia</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        kebo: {
+                            purple: '#8b5cf6',
+                            purpleDark: '#7c3aed',
+                            bg: '#0f1117',
+                            card: '#181a20',
+                            cardBorder: '#262933',
+                            red: '#ef4444'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background-color: #0b0c10;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #181a20;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        .toast-slide {
+            animation: slideDown 0.3s ease-out forwards;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 pb-28 md:pb-12 antialiased min-h-screen selection:bg-purple-600 selection:text-white">
+
+    <!-- Toast Notification Overlay -->
+    <div id="toastContainer" class="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-md pointer-events-none space-y-2"></div>
+
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 text-white sticky top-0 z-30 shadow-lg">
+        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+                <div class="w-9 h-9 rounded-xl bg-purple-600 flex items-center justify-center text-white font-black text-lg shadow-md shadow-purple-900/40">
+                    $
+                </div>
+                <div>
+                    <!-- Active Month Dropdown Trigger -->
+                    <button onclick="openMonthSelectorModal()" class="flex items-center gap-1.5 text-left group">
+                        <h1 class="text-base font-bold leading-tight group-hover:text-purple-400 transition" id="headerMonthTitle">
+                            Cargando Mes...
+                        </h1>
+                        <i class="fa-solid fa-chevron-down text-xs text-purple-400 group-hover:translate-y-0.5 transition"></i>
+                    </button>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-950/80 text-purple-300 border border-purple-800/60 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"></span>
+                            <span>Datos Octubre Actualizados</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-1">
+                <button onclick="openSubscriptionsModal()" title="Gestionar Suscripciones" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition text-sm flex items-center gap-1">
+                    <i class="fa-solid fa-rotate text-purple-400"></i>
+                </button>
+                <button onclick="openMonthSelectorModal()" title="Histórico de Meses" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition text-sm flex items-center gap-1">
+                    <i class="fa-solid fa-calendar-days text-purple-400"></i>
+                </button>
+                <button onclick="exportDataJSON()" title="Descargar Copia de Respaldo" class="p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition text-sm">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto px-4 pt-4 space-y-4">
+
+        <!-- Banner Global del Mes -->
+        <div id="summaryCard" class="bg-slate-900 rounded-2xl p-4 border border-slate-800 shadow-xl space-y-3">
+            <div class="flex justify-between items-center">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                    <i class="fa-solid fa-wallet text-purple-400"></i> Resumen del Mes
+                </span>
+                <span id="monthStatusBadge" class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-purple-950 text-purple-300 border border-purple-800">
+                    Calculando...
+                </span>
+            </div>
+
+            <!-- Total Budget Header -->
+            <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 flex justify-between items-center">
+                <div>
+                    <span class="text-[10px] text-slate-400 uppercase font-bold block">Presupuesto Fijo + Var.</span>
+                    <span id="totalBudgetedText" class="text-lg font-black text-white">$0</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-[10px] text-slate-400 uppercase font-bold block">Ingresos del Mes</span>
+                    <span id="totalIncomeText" class="text-sm font-bold text-emerald-400">$0</span>
+                </div>
+            </div>
+
+            <!-- General Execution Bar -->
+            <div class="space-y-1">
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-slate-400">Total Ejecutado: <strong id="totalSpentText" class="text-slate-100">$0</strong></span>
+                    <span id="totalPctText" class="font-bold text-purple-400">0%</span>
+                </div>
+                <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                    <div id="totalProgressBar" class="h-full bg-purple-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Key Metrics Grid -->
+            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800/60 text-xs">
+                <div class="bg-purple-950/30 p-2.5 rounded-xl border border-purple-900/40">
+                    <span class="text-[10px] font-bold text-purple-300 block uppercase">Falta Por Pagar (Fijos)</span>
+                    <span id="fixedPendingText" class="text-sm font-extrabold text-purple-200 block">$0</span>
+                </div>
+                <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                    <span class="text-[10px] font-bold text-slate-400 block uppercase">Efectivo Líquido Bancos</span>
+                    <span id="totalCashAvailableText" class="text-sm font-bold text-emerald-400 block">$0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deuda Total Acumulada Card -->
+        <div class="bg-gradient-to-r from-slate-900 via-rose-950/20 to-slate-900 border border-rose-900/40 rounded-2xl p-3.5 flex items-center justify-between shadow-md">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-rose-950/80 text-rose-400 border border-rose-800/60 flex items-center justify-center font-bold text-base shadow-inner">
+                    <i class="fa-solid fa-building-columns"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Deuda Total Créditos & TCs</span>
+                    <span id="totalDebtBalanceDisplay" class="text-base font-extrabold text-rose-300">$0</span>
+                </div>
+            </div>
+            <button onclick="switchTab('deudas')" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-semibold text-slate-300 border border-slate-700 flex items-center gap-1 transition">
+                <span>Ver Cuentas</span>
+                <i class="fa-solid fa-chevron-right text-[10px] text-purple-400"></i>
+            </button>
+        </div>
+
+        <!-- Tab Navigation Buttons -->
+        <div class="flex bg-slate-900 p-1 rounded-xl text-xs font-semibold text-slate-400 border border-slate-800">
+            <button onclick="switchTab('fijos')" id="tabBtnFijos" class="flex-1 py-2 rounded-lg transition-all font-bold bg-purple-600 text-white shadow flex items-center justify-center gap-1">
+                <i class="fa-solid fa-list-check"></i> Fijos
+            </button>
+            <button onclick="switchTab('variables')" id="tabBtnVariables" class="flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1 hover:text-white">
+                <i class="fa-solid fa-chart-pie"></i> Variables
+            </button>
+            <button onclick="switchTab('deudas')" id="tabBtnDeudas" class="flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1 hover:text-white">
+                <i class="fa-solid fa-wallet"></i> Bancos & TC
+            </button>
+            <button onclick="switchTab('historial')" id="tabBtnHistorial" class="flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1 hover:text-white">
+                <i class="fa-solid fa-receipt"></i> Historial
+            </button>
+        </div>
+
+        <!-- TAB 1: COMPROMISOS FIJOS Y ESTADO DE PAGO -->
+        <div id="tabFijos" class="space-y-3">
+            <div class="flex justify-between items-center px-1">
+                <div>
+                    <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-invoice-dollar text-purple-400"></i> Compromisos Fijos
+                    </h2>
+                    <p class="text-[11px] text-slate-400">Toca para marcar pagado o ver lo que falta</p>
+                </div>
+                <button onclick="openAddFixedModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30 font-medium px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+                    <i class="fa-solid fa-plus text-[10px]"></i> Agregar Fijo
+                </button>
+            </div>
+
+            <!-- List of Fixed Expenses -->
+            <div id="fixedExpensesList" class="space-y-2.5"></div>
+        </div>
+
+        <!-- TAB 2: PROYECCIÓN VS REAL (GASTOS VARIABLES) -->
+        <div id="tabVariables" class="space-y-3 hidden">
+            <div class="flex justify-between items-center px-1">
+                <div>
+                    <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
+                        <i class="fa-solid fa-sliders text-purple-400"></i> Gastos Variables
+                    </h2>
+                    <p class="text-[11px] text-slate-400">Presupuesto asignado vs desembolsos reales</p>
+                </div>
+                <button onclick="openSetProjectionsModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30 font-medium px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+                    <i class="fa-solid fa-pen text-[10px]"></i> Editar Metas
+                </button>
+            </div>
+
+            <div id="variableCategoriesList" class="space-y-2.5"></div>
+        </div>
+
+        <!-- TAB 3: CONTROL DE CUENTAS DE BANCOS Y TARJETAS DE CRÉDITO -->
+        <div id="tabDeudas" class="space-y-4 hidden">
+
+            <!-- Banner Suscripciones Recurrentes Cargadas -->
+            <div class="bg-purple-950/40 border border-purple-800/60 rounded-2xl p-3.5 space-y-2">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate text-purple-400"></i> Suscripciones Automatizadas en TC
+                    </h3>
+                    <button onclick="openSubscriptionsModal()" class="text-[11px] font-bold text-purple-400 hover:underline">
+                        Editar Catálogo
+                    </button>
+                </div>
+                <div id="activeSubscriptionsPreview" class="grid grid-cols-2 gap-2 text-xs"></div>
+            </div>
+
+            <!-- Cuentas de Débito / Dinero disponible -->
+            <div class="space-y-2">
+                <div class="flex justify-between items-center px-1">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-money-bill-transfer text-emerald-400"></i> Cuentas de Débito / Efectivo
+                    </h3>
+                    <span id="liquidTotalBadge" class="text-xs font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded-lg border border-emerald-800">$0</span>
+                </div>
+                <div id="accountsBalancesList" class="grid grid-cols-2 gap-2"></div>
+            </div>
+
+            <!-- Tarjetas de Crédito y Créditos Fijos -->
+            <div class="space-y-2 pt-2 border-t border-slate-800">
+                <div class="flex justify-between items-center px-1">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-credit-card text-rose-400"></i> Saldos de Créditos & Tarjetas
+                    </h3>
+                </div>
+                <div id="creditBalancesList" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- TAB 4: HISTORIAL DE REGISTROS DEL MES -->
+        <div id="tabHistorial" class="space-y-3 hidden">
+            <div class="flex justify-between items-center px-1">
+                <div>
+                    <h2 class="text-sm font-bold text-white">Movimientos del Mes</h2>
+                    <p class="text-[11px] text-slate-400">Ingresos y gastos anotados en este periodo</p>
+                </div>
+            </div>
+
+            <div id="transactionsList" class="space-y-2"></div>
+        </div>
+
+    </main>
+
+    <!-- Floating Fast Expense Button -->
+    <div class="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-md border-t border-slate-800/80 p-3 z-40">
+        <div class="max-w-md mx-auto flex items-center justify-between gap-2">
+            <button onclick="openQuickExpenseModal()" class="flex-1 bg-purple-600 hover:bg-purple-700 active:scale-[0.98] text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 transition text-sm">
+                <i class="fa-solid fa-bolt text-amber-300"></i>
+                <span>+ Registrar Movimiento (Gasto / Ingreso)</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: GESTOR DE SUSCRIPCIONES -->
+    <div id="modalSubscriptions" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i class="fa-solid fa-rotate text-purple-400"></i> Catálogo de Suscripciones
+                </h3>
+                <button onclick="closeModal('modalSubscriptions')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-400 leading-relaxed">
+                Estas suscripciones se cargan automáticamente a tus Tarjetas de Crédito de forma recurrente.
+            </p>
+
+            <div id="subscriptionsCatalogList" class="space-y-2"></div>
+
+            <form id="formAddSubscription" onsubmit="handleAddNewSubscription(event)" class="pt-2 border-t border-slate-800 space-y-2.5">
+                <h4 class="text-xs font-bold text-purple-300 uppercase tracking-wider">+ Nueva Suscripción</h4>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="subNewName" placeholder="Ej: Disney+" required class="p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                    <input type="number" id="subNewAmount" placeholder="Monto COP" required step="100" class="p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                </div>
+                <div>
+                    <select id="subNewCard" class="w-full p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                        <option value="TC Nu">TC Nu Bank</option>
+                        <option value="TC Rappi">TC Rappi</option>
+                        <option value="TC Bancolombia">TC Bancolombia</option>
+                        <option value="TC Banco de Bogotá">TC Banco de Bogotá</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow">
+                    Guardar Suscripción
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: SELECTOR E HISTÓRICO DE MESES -->
+    <div id="modalMonthSelector" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-days text-purple-400"></i> Seleccionar Mes
+                </h3>
+                <button onclick="closeModal('modalMonthSelector')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div id="monthsHistoryList" class="space-y-2"></div>
+            <div class="pt-2 border-t border-slate-800">
+                <button onclick="createNewMonthPrompt()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-plus"></i> Inicializar Siguiente Mes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: REGISTRAR MOVIMIENTO RÁPIDO -->
+    <div id="modalQuickExpense" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i class="fa-solid fa-bolt text-amber-300"></i> Registrar Movimiento
+                </h3>
+                <button onclick="closeModal('modalQuickExpense')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="handleQuickTransaction(event)" class="space-y-3">
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Tipo de Movimiento</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" id="typeGastoBtn" onclick="setTxType('gasto')" class="py-2 rounded-xl text-xs font-bold bg-rose-600 text-white transition">Gasto</button>
+                        <button type="button" id="typeIngresoBtn" onclick="setTxType('ingreso')" class="py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 transition">Ingreso</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Descripción</label>
+                    <input type="text" id="txDesc" placeholder="Ej: Supermercado" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 block mb-1">Monto (COP)</label>
+                        <input type="number" id="txAmount" placeholder="Ej: 45000" required step="100" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 block mb-1">Categoría Variable</label>
+                        <select id="txCategory" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                            <option value="Alimentación">Alimentación</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Entretenimiento">Entretenimiento</option>
+                            <option value="Salud y Cuidado">Salud y Cuidado</option>
+                            <option value="Otros Gastos">Otros Gastos</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Método de Pago / Cuenta afectada</label>
+                    <select id="txAccount" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                        <option value="Bancolombia Ahorros">Bancolombia Ahorros</option>
+                        <option value="Nequi">Nequi</option>
+                        <option value="Daviplata">Daviplata</option>
+                        <option value="TC Nu">TC Nu Bank</option>
+                        <option value="TC Rappi">TC Rappi</option>
+                        <option value="TC Bancolombia">TC Bancolombia</option>
+                        <option value="TC Banco de Bogotá">TC Banco de Bogotá</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-purple-600/30">
+                    Guardar Transacción
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: AGREGAR GASTO FIJO -->
+    <div id="modalAddFixed" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice-dollar text-purple-400"></i> Nuevo Compromiso Fijo
+                </h3>
+                <button onclick="closeModal('modalAddFixed')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="handleAddNewFixed(event)" class="space-y-3">
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Nombre del Gasto Fijo</label>
+                    <input type="text" id="fixedNewName" placeholder="Ej: Arriendo apartamento" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 block mb-1">Monto Presupuestado (COP)</label>
+                        <input type="number" id="fixedNewAmount" placeholder="Ej: 1200000" required step="100" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 block mb-1">Día Límite Pago</label>
+                        <input type="number" id="fixedNewDay" placeholder="Ej: 5" min="1" max="31" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow">
+                    Crear Gasto Fijo
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EDITAR METAS VARIABLES -->
+    <div id="modalSetProjections" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-purple-400"></i> Ajustar Presupuesto Variable
+                </h3>
+                <button onclick="closeModal('modalSetProjections')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="handleSaveProjections(event)" class="space-y-3">
+                <div class="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1" id="projectionsFormInputs"></div>
+                <button type="submit" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow">
+                    Guardar Nuevas Metas
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Estado Global con Octubre 2026 configurado
+        let currentMonthKey = "2026-10";
+        let currentTab = "fijos";
+        let currentTxTypeSelection = "gasto";
+
+        // Estructura de Datos Actualizada para Octubre con base en el Manual
+        const defaultAppData = {
+            "2026-10": {
+                title: "Octubre 2026",
+                status: "En Curso",
+                income: 4800000,
+                fixedExpenses: [
+                    { id: "f1", name: "Arriendo Apartamento", amount: 1350000, paid: false, day: 5 },
+                    { id: "f2", name: "Servicios Públicos (Luz/Gas/Agua)", amount: 290000, paid: false, day: 10 },
+                    { id: "f3", name: "Internet Fibra Óptica", amount: 95000, paid: false, day: 15 },
+                    { id: "f4", name: "Cuota Préstamo Familiar", amount: 400000, paid: false, day: 28 },
+                    { id: "f5", name: "TC Nu Bank (Extracto)", amount: 125400, paid: false, day: 20 },
+                    { id: "f6", name: "TC Rappi (Extracto)", amount: 370000, paid: false, day: 22 }
+                ],
+                variableBudgets: {
+                    "Alimentación": 850000,
+                    "Transporte": 380000,
+                    "Entretenimiento": 250000,
+                    "Salud y Cuidado": 150000,
+                    "Otros Gastos": 200000
+                },
+                accounts: {
+                    "Bancolombia Ahorros": 1950000,
+                    "Nequi": 420000,
+                    "Daviplata": 150000
+                },
+                credits: {
+                    "TC Nu": 125400,
+                    "TC Rappi": 370000,
+                    "TC Bancolombia": 1450000,
+                    "TC Banco de Bogotá": 0
+                },
+                transactions: [
+                    { id: "t1", desc: "Supermercado Inicial Octubre", amount: 210000, category: "Alimentación", account: "Bancolombia Ahorros", type: "gasto", date: "01 Oct" }
+                ]
+            }
+        };
+
+        const defaultSubscriptions = [
+            { id: "s1", name: "Mercado", amount: 650000, card: "TC Rappi" },
+            { id: "s2", name: "Netflix", amount: 18900, card: "TC Nu" },
+            { id: "s3", name: "Inteligencia Artificial", amount: 63100, card: "TC Nu" },
+            { id: "s4", name: "Google Cloud", amount: 12900, card: "TC Nu" },
+            { id: "s5", name: "Spotify", amount: 30500, card: "TC Nu" }
+        ];
+
+        // Cargar Estado desde LocalStorage o inicializar
+        let appData = JSON.parse(localStorage.getItem("kebo_finances_data")) || defaultAppData;
+        let subscriptionsCatalog = JSON.parse(localStorage.getItem("kebo_subscriptions")) || defaultSubscriptions;
+
+        function saveToLocalStorage() {
+            localStorage.setItem("kebo_finances_data", JSON.stringify(appData));
+            localStorage.setItem("kebo_subscriptions", JSON.stringify(subscriptionsCatalog));
+        }
+
+        // Formatear Moneda Colombiana COP
+        function formatCOP(num) {
+            return "$" + Number(num || 0).toLocaleString("es-CO");
+        }
+
+        // Sistema de Notificaciones Toast
+        function showToast(message, type = "success") {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = `toast-slide p-3 rounded-xl shadow-xl border text-xs font-semibold flex items-center gap-2 pointer-events-auto ${
+                type === "success" 
+                    ? "bg-slate-900 text-emerald-300 border-emerald-800/80" 
+                    : "bg-slate-900 text-rose-300 border-rose-800/80"
+            }`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check text-emerald-400' : 'fa-triangle-exclamation text-rose-400'} text-sm"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Inicialización al cargar la ventana
+        window.onload = function() {
+            if (!appData[currentMonthKey]) {
+                const keys = Object.keys(appData);
+                currentMonthKey = keys[keys.length - 1];
+            }
+            renderAll();
+        };
+
+        function renderAll() {
+            renderHeader();
+            renderSummaryCard();
+            renderTabContent();
+            renderActiveSubscriptionsPreview();
+        }
+
+        // Renderizar Encabezado y Mes Activo
+        function renderHeader() {
+            const monthObj = appData[currentMonthKey];
+            document.getElementById("headerMonthTitle").innerText = monthObj ? monthObj.title : currentMonthKey;
+        }
+
+        // Renderizar Tarjeta Resumen Global
+        function renderSummaryCard() {
+            const m = appData[currentMonthKey];
+            if (!m) return;
+
+            document.getElementById("monthStatusBadge").innerText = m.status;
+
+            const totalFixedBudget = m.fixedExpenses.reduce((acc, item) => acc + item.amount, 0);
+            const totalVariableBudget = Object.values(m.variableBudgets).reduce((acc, val) => acc + val, 0);
+            const totalBudget = totalFixedBudget + totalVariableBudget;
+            document.getElementById("totalBudgetedText").innerText = formatCOP(totalBudget);
+
+            document.getElementById("totalIncomeText").innerText = formatCOP(m.income);
+
+            const totalSpent = m.transactions
+                .filter(t => t.type === 'gasto')
+                .reduce((acc, t) => acc + t.amount, 0);
+            document.getElementById("totalSpentText").innerText = formatCOP(totalSpent);
+
+            const pct = totalBudget > 0 ? Math.min(Math.round((totalSpent / totalBudget) * 100), 100) : 0;
+            document.getElementById("totalPctText").innerText = pct + "%";
+            document.getElementById("totalProgressBar").style.width = pct + "%";
+
+            const fixedPending = m.fixedExpenses
+                .filter(f => !f.paid)
+                .reduce((acc, f) => acc + f.amount, 0);
+            document.getElementById("fixedPendingText").innerText = formatCOP(fixedPending);
+
+            const totalCash = Object.values(m.accounts).reduce((acc, val) => acc + val, 0);
+            document.getElementById("totalCashAvailableText").innerText = formatCOP(totalCash);
+
+            const totalDebt = Object.values(m.credits).reduce((acc, val) => acc + val, 0);
+            document.getElementById("totalDebtBalanceDisplay").innerText = formatCOP(totalDebt);
+        }
+
+        // Cambio de Pestañas
+        function switchTab(tabId) {
+            currentTab = tabId;
+            const tabs = ['fijos', 'variables', 'deudas', 'historial'];
+            tabs.forEach(t => {
+                const el = document.getElementById("tab" + t.charAt(0).toUpperCase() + t.slice(1));
+                const btn = document.getElementById("tabBtn" + t.charAt(0).toUpperCase() + t.slice(1));
+                if (t === tabId) {
+                    el.classList.remove("hidden");
+                    btn.className = "flex-1 py-2 rounded-lg transition-all font-bold bg-purple-600 text-white shadow flex items-center justify-center gap-1";
+                } else {
+                    el.classList.add("hidden");
+                    btn.className = "flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1 hover:text-white text-slate-400";
+                }
+            });
+            renderTabContent();
+        }
+
+        function renderTabContent() {
+            if (currentTab === 'fijos') renderFixedExpenses();
+            if (currentTab === 'variables') renderVariableCategories();
+            if (currentTab === 'deudas') renderDebtsAndAccounts();
+            if (currentTab === 'historial') renderTransactionsHistory();
+        }
+
+        // RENDER 1: GASTOS FIJOS
+        function renderFixedExpenses() {
+            const container = document.getElementById("fixedExpensesList");
+            const m = appData[currentMonthKey];
+            if (!m || !m.fixedExpenses.length) {
+                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-500 bg-slate-900 rounded-2xl border border-slate-800">No hay compromisos fijos registrados para este mes.</div>`;
+                return;
+            }
+
+            container.innerHTML = m.fixedExpenses.map(item => `
+                <div class="bg-slate-900 p-3.5 rounded-2xl border ${item.paid ? 'border-emerald-900/50 bg-slate-900/80' : 'border-slate-800'} flex items-center justify-between shadow-md transition">
+                    <div class="flex items-center gap-3">
+                        <button onclick="toggleFixedPaid('${item.id}')" class="w-8 h-8 rounded-xl flex items-center justify-center transition ${item.paid ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40' : 'bg-slate-800 text-slate-500 hover:text-white border border-slate-700'}">
+                            <i class="fa-solid ${item.paid ? 'fa-check text-xs' : 'fa-circle text-[8px]' }"></i>
+                        </button>
+                        <div>
+                            <h4 class="text-xs font-bold ${item.paid ? 'text-slate-400 line-through' : 'text-white'}">${item.name}</h4>
+                            <span class="text-[10px] text-slate-400 block">Día límite: ${item.day} de cada mes</span>
+                        </div>
+                    </div>
+                    <div class="text-right flex items-center gap-3">
+                        <div>
+                            <span class="text-xs font-extrabold ${item.paid ? 'text-slate-500' : 'text-purple-300'} block">${formatCOP(item.amount)}</span>
+                            <span class="text-[9px] px-2 py-0.5 rounded-full ${item.paid ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">${item.paid ? 'Pagado' : 'Pendiente'}</span>
+                        </div>
+                        <button onclick="deleteFixedExpense('${item.id}')" class="text-slate-600 hover:text-rose-400 p-1 transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleFixedPaid(id) {
+            const m = appData[currentMonthKey];
+            const item = m.fixedExpenses.find(f => f.id === id);
+            if (item) {
+                item.paid = !item.paid;
+                saveToLocalStorage();
+                renderAll();
+                showToast(item.paid ? `Marcado como pagado: ${item.name}` : `Marcado como pendiente`);
+            }
+        }
+
+        function deleteFixedExpense(id) {
+            const m = appData[currentMonthKey];
+            m.fixedExpenses = m.fixedExpenses.filter(f => f.id !== id);
+            saveToLocalStorage();
+            renderAll();
+            showToast("Gasto fijo eliminado", "error");
+        }
+
+        // RENDER 2: GASTOS VARIABLES
+        function renderVariableCategories() {
+            const container = document.getElementById("variableCategoriesList");
+            const m = appData[currentMonthKey];
+            if (!m) return;
+
+            const spentMap = {};
+            m.transactions.filter(t => t.type === 'gasto').forEach(t => {
+                spentMap[t.category] = (spentMap[t.category] || 0) + t.amount;
+            });
+
+            container.innerHTML = Object.entries(m.variableBudgets).map(([cat, budget]) => {
+                const spent = spentMap[cat] || 0;
+                const pct = budget > 0 ? Math.min(Math.round((spent / budget) * 100), 100) : 0;
+                const isOver = spent > budget;
+
+                return `
+                    <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 space-y-2 shadow-md">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="font-bold text-white flex items-center gap-1.5">
+                                <i class="fa-solid fa-tag text-purple-400 text-[10px]"></i> ${cat}
+                            </span>
+                            <span class="text-slate-400">Presupuesto: <strong class="text-white">${formatCOP(budget)}</strong></span>
+                        </div>
+                        <div class="flex justify-between items-center text-[11px]">
+                            <span class="${isOver ? 'text-rose-400 font-bold' : 'text-slate-300'}">Ejecutado: ${formatCOP(spent)}</span>
+                            <span class="font-bold ${isOver ? 'text-rose-400' : 'text-purple-400'}">${pct}%</span>
+                        </div>
+                        <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                            <div class="h-full rounded-full transition-all duration-500 ${isOver ? 'bg-rose-500' : 'bg-purple-500'}" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // RENDER 3: BANCOS Y TARJETAS
+        function renderDebtsAndAccounts() {
+            const m = appData[currentMonthKey];
+            if (!m) return;
+
+            const accContainer = document.getElementById("accountsBalancesList");
+            let totalLiquid = 0;
+            accContainer.innerHTML = Object.entries(m.accounts).map(([accName, balance]) => {
+                totalLiquid += balance;
+                return `
+                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex flex-col justify-between shadow">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase truncate">${accName}</span>
+                        <span class="text-sm font-extrabold text-emerald-400 mt-1">${formatCOP(balance)}</span>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById("liquidTotalBadge").innerText = formatCOP(totalLiquid);
+
+            const credContainer = document.getElementById("creditBalancesList");
+            credContainer.innerHTML = Object.entries(m.credits).map(([credName, balance]) => {
+                return `
+                    <div class="bg-slate-900 p-3.5 rounded-2xl border border-slate-800 flex items-center justify-between shadow">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-rose-950/80 text-rose-400 border border-rose-800 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-credit-card"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">${credName}</h4>
+                                <span class="text-[10px] text-slate-400">Saldo pendiente de pago</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-extrabold text-rose-300 block">${formatCOP(balance)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // RENDER 4: HISTORIAL DE TRANSACCIONES
+        function renderTransactionsHistory() {
+            const container = document.getElementById("transactionsList");
+            const m = appData[currentMonthKey];
+            if (!m || !m.transactions.length) {
+                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-500 bg-slate-900 rounded-2xl border border-slate-800">No hay transacciones registradas este mes.</div>`;
+                return;
+            }
+
+            container.innerHTML = m.transactions.slice().reverse().map(t => `
+                <div class="bg-slate-900 p-3 rounded-2xl border border-slate-800 flex items-center justify-between shadow">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center text-sm ${t.type === 'ingreso' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-slate-800 text-purple-400 border border-slate-700'}">
+                            <i class="fa-solid ${t.type === 'ingreso' ? 'fa-arrow-down-long' : 'fa-arrow-up-long'}"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">${t.desc}</h4>
+                            <span class="text-[10px] text-slate-400">${t.category} • ${t.account} (${t.date})</span>
+                        </div>
+                    </div>
+                    <div class="text-right flex items-center gap-2">
+                        <span class="text-xs font-black ${t.type === 'ingreso' ? 'text-emerald-400' : 'text-slate-100'}">
+                            ${t.type === 'ingreso' ? '+' : '-'}${formatCOP(t.amount)}
+                        </span>
+                        <button onclick="deleteTransaction('${t.id}')" class="text-slate-600 hover:text-rose-400 p-1"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function deleteTransaction(id) {
+            const m = appData[currentMonthKey];
+            m.transactions = m.transactions.filter(t => t.id !== id);
+            saveToLocalStorage();
+            renderAll();
+            showToast("Transacción eliminada", "error");
+        }
+
+        // RENDER SUSCRIPCIONES PREVIEW
+        function renderActiveSubscriptionsPreview() {
+            const container = document.getElementById("activeSubscriptionsPreview");
+            container.innerHTML = subscriptionsCatalog.map(sub => `
+                <div class="bg-slate-900/90 p-2 rounded-xl border border-slate-800 flex justify-between items-center">
+                    <div>
+                        <span class="text-[11px] font-bold text-white block truncate">${sub.name}</span>
+                        <span class="text-[9px] text-purple-400">${sub.card}</span>
+                    </div>
+                    <span class="text-[11px] font-extrabold text-purple-200">${formatCOP(sub.amount)}</span>
+                </div>
+            `).join('');
+        }
+
+        // CONTROL DE MODALES
+        function openModal(id) { document.getElementById(id).classList.remove("hidden"); }
+        function closeModal(id) { document.getElementById(id).classList.add("hidden"); }
+
+        function openSubscriptionsModal() {
+            const container = document.getElementById("subscriptionsCatalogList");
+            container.innerHTML = subscriptionsCatalog.map(sub => `
+                <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
+                    <div>
+                        <strong class="text-white block">${sub.name}</strong>
+                        <span class="text-[10px] text-purple-400">${sub.card} • ${formatCOP(sub.amount)}</span>
+                    </div>
+                    <button onclick="deleteSubscription('${sub.id}')" class="text-slate-500 hover:text-rose-400 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            `).join('');
+            openModal("modalSubscriptions");
+        }
+
+        function handleAddNewSubscription(e) {
+            e.preventDefault();
+            const name = document.getElementById("subNewName").value;
+            const amount = parseFloat(document.getElementById("subNewAmount").value);
+            const card = document.getElementById("subNewCard").value;
+
+            subscriptionsCatalog.push({ id: "sub_" + Date.now(), name, amount, card });
+            saveToLocalStorage();
+            renderActiveSubscriptionsPreview();
+            closeModal("modalSubscriptions");
+            document.getElementById("formAddSubscription").reset();
+            showToast("Suscripción agregada correctamente");
+        }
+
+        function deleteSubscription(id) {
+            subscriptionsCatalog = subscriptionsCatalog.filter(s => s.id !== id);
+            saveToLocalStorage();
+            renderActiveSubscriptionsPreview();
+            openSubscriptionsModal();
+            showToast("Suscripción eliminada", "error");
+        }
+
+        function openMonthSelectorModal() {
+            const container = document.getElementById("monthsHistoryList");
+            container.innerHTML = Object.entries(appData).map(([key, m]) => `
+                <button onclick="selectMonth('${key}')" class="w-full p-3 rounded-xl border ${key === currentMonthKey ? 'bg-purple-950/60 border-purple-800 text-purple-300' : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800'} flex items-center justify-between text-xs font-bold transition">
+                    <span>${m.title}</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-slate-900 border border-slate-700">${m.status}</span>
+                </button>
+            `).join('');
+            openModal("modalMonthSelector");
+        }
+
+        function selectMonth(key) {
+            currentMonthKey = key;
+            closeModal("modalMonthSelector");
+            renderAll();
+            showToast(`Cambiado a mes: ${appData[key].title}`);
+        }
+
+        function createNewMonthPrompt() {
+            const newKey = prompt("Ingrese clave del mes (Ej: 2026-11):", "2026-11");
+            if (!newKey) return;
+            const title = prompt("Ingrese título legible del mes (Ej: Noviembre 2026):", "Noviembre 2026");
+            if (!title) return;
+
+            const prevMonth = appData[currentMonthKey];
+            const clonedFixed = prevMonth.fixedExpenses.map(f => ({ ...f, paid: false }));
+
+            appData[newKey] = {
+                title: title,
+                status: "En Curso",
+                income: prevMonth.income,
+                fixedExpenses: clonedFixed,
+                variableBudgets: { ...prevMonth.variableBudgets },
+                accounts: { ...prevMonth.accounts },
+                credits: { ...prevMonth.credits },
+                transactions: []
+            };
+
+            currentMonthKey = newKey;
+            saveToLocalStorage();
+            closeModal("modalMonthSelector");
+            renderAll();
+            showToast(`¡Nuevo mes ${title} inicializado!`);
+        }
+
+        function openQuickExpenseModal() {
+            setTxType('gasto');
+            openModal("modalQuickExpense");
+        }
+
+        function setTxType(type) {
+            currentTxTypeSelection = type;
+            const gBtn = document.getElementById("typeGastoBtn");
+            const iBtn = document.getElementById("typeIngresoBtn");
+            if (type === 'gasto') {
+                gBtn.className = "py-2 rounded-xl text-xs font-bold bg-rose-600 text-white transition";
+                iBtn.className = "py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 transition";
+            } else {
+                gBtn.className = "py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 transition";
+                iBtn.className = "py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white transition";
+            }
+        }
+
+        function handleQuickTransaction(e) {
+            e.preventDefault();
+            const desc = document.getElementById("txDesc").value;
+            const amount = parseFloat(document.getElementById("txAmount").value);
+            const category = document.getElementById("txCategory").value;
+            const account = document.getElementById("txAccount").value;
+
+            const now = new Date();
+            const dateStr = now.getDate() + " " + ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"][now.getMonth()];
+
+            const m = appData[currentMonthKey];
+            m.transactions.push({
+                id: "t_" + Date.now(),
+                desc,
+                amount,
+                category,
+                account,
+                type: currentTxTypeSelection,
+                date: dateStr
+            });
+
+            if (currentTxTypeSelection === 'gasto') {
+                if (m.accounts[account] !== undefined) {
+                    m.accounts[account] = Math.max(0, m.accounts[account] - amount);
+                } else if (m.credits[account] !== undefined) {
+                    m.credits[account] += amount;
+                }
+            } else {
+                if (m.accounts[account] !== undefined) {
+                    m.accounts[account] += amount;
+                }
+                m.income += amount;
+            }
+
+            saveToLocalStorage();
+            closeModal("modalQuickExpense");
+            document.getElementById("modalQuickExpense").querySelector("form").reset();
+            renderAll();
+            showToast("Movimiento registrado con éxito");
+        }
+
+        function openAddFixedModal() { openModal("modalAddFixed"); }
+
+        function handleAddNewFixed(e) {
+            e.preventDefault();
+            const name = document.getElementById("fixedNewName").value;
+            const amount = parseFloat(document.getElementById("fixedNewAmount").value);
+            const day = parseInt(document.getElementById("fixedNewDay").value);
+
+            const m = appData[currentMonthKey];
+            m.fixedExpenses.push({
+                id: "f_" + Date.now(),
+                name,
+                amount,
+                paid: false,
+                day
+            });
+
+            saveToLocalStorage();
+            closeModal("modalAddFixed");
+            document.getElementById("modalAddFixed").querySelector("form").reset();
+            renderAll();
+            showToast("Compromiso fijo agregado");
+        }
+
+        function openSetProjectionsModal() {
+            const container = document.getElementById("projectionsFormInputs");
+            const m = appData[currentMonthKey];
+            container.innerHTML = Object.entries(m.variableBudgets).map(([cat, val]) => `
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">${cat}</label>
+                    <input type="number" id="proj_${cat}" value="${val}" step="1000" required class="w-full p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                </div>
+            `).join('');
+            openModal("modalSetProjections");
+        }
+
+        function handleSaveProjections(e) {
+            e.preventDefault();
+            const m = appData[currentMonthKey];
+            Object.keys(m.variableBudgets).forEach(cat => {
+                const input = document.getElementById("proj_" + cat);
+                if (input) {
+                    m.variableBudgets[cat] = parseFloat(input.value) || 0;
+                }
+            });
+
+            saveToLocalStorage();
+            closeModal("modalSetProjections");
+            renderAll();
+            showToast("Metas de presupuesto actualizadas");
+        }
+
+        function exportDataJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `kebo_finanzas_respaldo_${currentMonthKey}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("Archivo de respaldo descargado");
+        }
+    </script>
+</body>
+</html>
