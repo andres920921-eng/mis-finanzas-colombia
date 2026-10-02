@@ -59,7 +59,6 @@
 </head>
 <body class="bg-slate-950 text-slate-100 pb-28 md:pb-12 antialiased min-h-screen selection:bg-purple-600 selection:text-white">
 
-    <!-- Toast Notification Overlay -->
     <div id="toastContainer" class="fixed top-3 left-1/2 -translate-x-1/2 z-50 w-11/12 max-w-md pointer-events-none space-y-2"></div>
 
     <!-- Top Navigation Header -->
@@ -73,20 +72,23 @@
                     <!-- Active Month Dropdown Trigger -->
                     <button onclick="openMonthSelectorModal()" class="flex items-center gap-1.5 text-left group">
                         <h1 class="text-base font-bold leading-tight group-hover:text-purple-400 transition" id="headerMonthTitle">
-                            Cargando Mes...
+                            Octubre 2026
                         </h1>
                         <i class="fa-solid fa-chevron-down text-xs text-purple-400 group-hover:translate-y-0.5 transition"></i>
                     </button>
                     <div class="flex items-center gap-2 mt-0.5">
                         <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-950/80 text-purple-300 border border-purple-800/60 flex items-center gap-1">
                             <span class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-pulse"></span>
-                            <span>Datos Octubre Actualizados</span>
+                            <span>Datos Reales Sincronizados</span>
                         </span>
                     </div>
                 </div>
             </div>
             <div class="flex items-center space-x-1">
-                <button onclick="openSubscriptionsModal()" title="Gestionar Suscripciones" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition text-sm flex items-center gap-1">
+                <button onclick="openIncomeModal()" title="Gestionar Quincenas e Ingresos" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition text-sm flex items-center gap-1">
+                    <i class="fa-solid fa-wallet text-emerald-400"></i>
+                </button>
+                <button onclick="openSubscriptionsModal()" title="Catálogo de Suscripciones" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition text-sm flex items-center gap-1">
                     <i class="fa-solid fa-rotate text-purple-400"></i>
                 </button>
                 <button onclick="openMonthSelectorModal()" title="Histórico de Meses" class="p-2 text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition text-sm flex items-center gap-1">
@@ -105,10 +107,10 @@
         <div id="summaryCard" class="bg-slate-900 rounded-2xl p-4 border border-slate-800 shadow-xl space-y-3">
             <div class="flex justify-between items-center">
                 <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                    <i class="fa-solid fa-wallet text-purple-400"></i> Resumen del Mes
+                    <i class="fa-solid fa-chart-pie text-purple-400"></i> Resumen del Mes
                 </span>
                 <span id="monthStatusBadge" class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-purple-950 text-purple-300 border border-purple-800">
-                    Calculando...
+                    En Curso
                 </span>
             </div>
 
@@ -119,7 +121,7 @@
                     <span id="totalBudgetedText" class="text-lg font-black text-white">$0</span>
                 </div>
                 <div class="text-right">
-                    <span class="text-[10px] text-slate-400 uppercase font-bold block">Ingresos del Mes</span>
+                    <span class="text-[10px] text-slate-400 uppercase font-bold block">Ingresos Totales (Quincenas)</span>
                     <span id="totalIncomeText" class="text-sm font-bold text-emerald-400">$0</span>
                 </div>
             </div>
@@ -127,7 +129,7 @@
             <!-- General Execution Bar -->
             <div class="space-y-1">
                 <div class="flex justify-between items-center text-xs">
-                    <span class="text-slate-400">Total Ejecutado: <strong id="totalSpentText" class="text-slate-100">$0</strong></span>
+                    <span class="text-slate-400">Total Gastado/Ejecutado: <strong id="totalSpentText" class="text-slate-100">$0</strong></span>
                     <span id="totalPctText" class="font-bold text-purple-400">0%</span>
                 </div>
                 <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden p-0.5 border border-slate-800">
@@ -142,7 +144,7 @@
                     <span id="fixedPendingText" class="text-sm font-extrabold text-purple-200 block">$0</span>
                 </div>
                 <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
-                    <span class="text-[10px] font-bold text-slate-400 block uppercase">Efectivo Líquido Bancos</span>
+                    <span class="text-[10px] font-bold text-slate-400 block uppercase">Efectivo Líquido (B. Bogotá)</span>
                     <span id="totalCashAvailableText" class="text-sm font-bold text-emerald-400 block">$0</span>
                 </div>
             </div>
@@ -186,12 +188,12 @@
             <div class="flex justify-between items-center px-1">
                 <div>
                     <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
-                        <i class="fa-solid fa-file-invoice-dollar text-purple-400"></i> Compromisos Fijos
+                        <i class="fa-solid fa-file-invoice-dollar text-purple-400"></i> Compromisos Fijos Reales
                     </h2>
-                    <p class="text-[11px] text-slate-400">Toca para marcar pagado o ver lo que falta</p>
+                    <p class="text-[11px] text-slate-400">Toca para marcar pagado o editar el valor del recibo</p>
                 </div>
                 <button onclick="openAddFixedModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30 font-medium px-3 py-1.5 rounded-xl transition flex items-center gap-1">
-                    <i class="fa-solid fa-plus text-[10px]"></i> Agregar Fijo
+                    <i class="fa-solid fa-plus text-[10px]"></i> Agregar
                 </button>
             </div>
 
@@ -247,8 +249,11 @@
             <div class="space-y-2 pt-2 border-t border-slate-800">
                 <div class="flex justify-between items-center px-1">
                     <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-credit-card text-rose-400"></i> Saldos de Créditos & Tarjetas
+                        <i class="fa-solid fa-credit-card text-rose-400"></i> Saldos Totales de Créditos & TCs
                     </h3>
+                    <button onclick="openEditDebtsModal()" class="text-[11px] font-bold text-rose-400 hover:underline">
+                        Editar Saldos
+                    </button>
                 </div>
                 <div id="creditBalancesList" class="space-y-2"></div>
             </div>
@@ -268,13 +273,43 @@
 
     </main>
 
-    <!-- Floating Fast Expense Button -->
+    <!-- Bottom Quick Action Bar -->
     <div class="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-md border-t border-slate-800/80 p-3 z-40">
         <div class="max-w-md mx-auto flex items-center justify-between gap-2">
             <button onclick="openQuickExpenseModal()" class="flex-1 bg-purple-600 hover:bg-purple-700 active:scale-[0.98] text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 transition text-sm">
                 <i class="fa-solid fa-bolt text-amber-300"></i>
                 <span>+ Registrar Movimiento (Gasto / Ingreso)</span>
             </button>
+        </div>
+    </div>
+
+    <!-- MODAL: GESTOR DE QUINCENAS E INGRESOS -->
+    <div id="modalIncome" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i class="fa-solid fa-wallet text-emerald-400"></i> Ingresos y Quincenas del Mes
+                </h3>
+                <button onclick="closeModal('modalIncome')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed">
+                Tu salario entra por dos quincenas. Ingresa los montos correspondientes para actualizar tus ingresos totales del mes y el saldo en tu cuenta principal de Banco de Bogotá.
+            </p>
+            <form onsubmit="handleSaveIncomes(event)" class="space-y-3 pt-1">
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Primera Quincena (COP)</label>
+                    <input type="number" id="incomeQ1Input" placeholder="Ej: 2500000" required step="100" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Segunda Quincena (COP)</label>
+                    <input type="number" id="incomeQ2Input" placeholder="Ej: 2500000" required step="100" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                </div>
+                <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-lg">
+                    Guardar Quincenas e Ingresos
+                </button>
+            </form>
         </div>
     </div>
 
@@ -291,7 +326,7 @@
             </div>
 
             <p class="text-xs text-slate-400 leading-relaxed">
-                Estas suscripciones se cargan automáticamente a tus Tarjetas de Crédito de forma recurrente.
+                Estas suscripciones se automatizan como deuda en las Tarjetas de Crédito al inicializar un nuevo mes.
             </p>
 
             <div id="subscriptionsCatalogList" class="space-y-2"></div>
@@ -312,6 +347,60 @@
                 </div>
                 <button type="submit" class="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow">
                     Guardar Suscripción
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EDITAR VALOR COMPROMISO FIJO -->
+    <div id="modalEditFixed" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i class="fa-solid fa-pen text-purple-400"></i> Editar Recibo / Gasto Fijo
+                </h3>
+                <button onclick="closeModal('modalEditFixed')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="handleSaveEditFixed(event)" class="space-y-3">
+                <input type="hidden" id="editFixedId">
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Nombre del Gasto Fijo</label>
+                    <input type="text" id="editFixedName" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 block mb-1">Monto Real del Recibo (COP)</label>
+                        <input type="number" id="editFixedAmount" required step="100" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 block mb-1">Día Límite</label>
+                        <input type="number" id="editFixedDay" min="1" max="31" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow">
+                    Actualizar Monto
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EDITAR SALDOS DE CRÉDITOS Y TCs -->
+    <div id="modalEditDebts" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i class="fa-solid fa-building-columns text-rose-400"></i> Ajustar Saldos Totales de Deuda
+                </h3>
+                <button onclick="closeModal('modalEditDebts')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="handleSaveEditDebts(event)" class="space-y-3">
+                <div id="editDebtsInputsList" class="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1"></div>
+                <button type="submit" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow">
+                    Guardar Saldos Actualizados
                 </button>
             </form>
         </div>
@@ -352,13 +441,13 @@
                 <div>
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Tipo de Movimiento</label>
                     <div class="grid grid-cols-2 gap-2">
-                        <button type="button" id="typeGastoBtn" onclick="setTxType('gasto')" class="py-2 rounded-xl text-xs font-bold bg-rose-600 text-white transition">Gasto</button>
+                        <button type="button" id="typeGastoBtn" onclick="setTxType('gasto')" class="py-2 rounded-xl text-xs font-bold bg-rose-600 text-white transition">Gasto Variable / TC</button>
                         <button type="button" id="typeIngresoBtn" onclick="setTxType('ingreso')" class="py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 transition">Ingreso</button>
                     </div>
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Descripción</label>
-                    <input type="text" id="txDesc" placeholder="Ej: Supermercado" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                    <input type="text" id="txDesc" placeholder="Ej: Supermercado o Cena" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -379,14 +468,14 @@
                 <div>
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Método de Pago / Cuenta afectada</label>
                     <select id="txAccount" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
-                        <option value="Bancolombia Ahorros">Bancolombia Ahorros</option>
-                        <option value="Nequi">Nequi</option>
-                        <option value="Daviplata">Daviplata</option>
+                        <option value="Banco de Bogotá">Banco de Bogotá (Débito)</option>
                         <option value="TC Nu">TC Nu Bank</option>
                         <option value="TC Rappi">TC Rappi</option>
                         <option value="TC Bancolombia">TC Bancolombia</option>
-                        <option value="TC Banco de Bogotá">TC Banco de Bogotá</option>
+                        <option value="TC Banco de Bogotá">TC Banco de Bogotá (Crédito)</option>
+                        <option value="Hipotecario Davivienda">Hipotecario Davivienda</option>
                     </select>
+                    <p class="text-[10px] text-purple-300 mt-1">Si pagas con TC, reduce tu presupuesto variable y suma a la deuda de la tarjeta seleccionada (Cero doble conteo).</p>
                 </div>
                 <button type="submit" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-purple-600/30">
                     Guardar Transacción
@@ -409,16 +498,16 @@
             <form onsubmit="handleAddNewFixed(event)" class="space-y-3">
                 <div>
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Nombre del Gasto Fijo</label>
-                    <input type="text" id="fixedNewName" placeholder="Ej: Arriendo apartamento" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                    <input type="text" id="fixedNewName" placeholder="Ej: Seguro de auto" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 block mb-1">Monto Presupuestado (COP)</label>
-                        <input type="number" id="fixedNewAmount" placeholder="Ej: 1200000" required step="100" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                        <input type="number" id="fixedNewAmount" placeholder="Ej: 150000" required step="100" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
                     </div>
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 block mb-1">Día Límite Pago</label>
-                        <input type="number" id="fixedNewDay" placeholder="Ej: 5" min="1" max="31" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                        <input type="number" id="fixedNewDay" placeholder="Ej: 10" min="1" max="31" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
                     </div>
                 </div>
                 <button type="submit" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow">
@@ -449,49 +538,32 @@
     </div>
 
     <script>
-        // Estado Global con Octubre 2026 configurado
+        // Estado Global con Octubre 2026 configurado exactamente con tus datos
         let currentMonthKey = "2026-10";
         let currentTab = "fijos";
         let currentTxTypeSelection = "gasto";
 
-        // Estructura de Datos Actualizada para Octubre con base en el Manual
-        const defaultAppData = {
-            "2026-10": {
-                title: "Octubre 2026",
-                status: "En Curso",
-                income: 4800000,
-                fixedExpenses: [
-                    { id: "f1", name: "Arriendo Apartamento", amount: 1350000, paid: false, day: 5 },
-                    { id: "f2", name: "Servicios Públicos (Luz/Gas/Agua)", amount: 290000, paid: false, day: 10 },
-                    { id: "f3", name: "Internet Fibra Óptica", amount: 95000, paid: false, day: 15 },
-                    { id: "f4", name: "Cuota Préstamo Familiar", amount: 400000, paid: false, day: 28 },
-                    { id: "f5", name: "TC Nu Bank (Extracto)", amount: 125400, paid: false, day: 20 },
-                    { id: "f6", name: "TC Rappi (Extracto)", amount: 370000, paid: false, day: 22 }
-                ],
-                variableBudgets: {
-                    "Alimentación": 850000,
-                    "Transporte": 380000,
-                    "Entretenimiento": 250000,
-                    "Salud y Cuidado": 150000,
-                    "Otros Gastos": 200000
-                },
-                accounts: {
-                    "Bancolombia Ahorros": 1950000,
-                    "Nequi": 420000,
-                    "Daviplata": 150000
-                },
-                credits: {
-                    "TC Nu": 125400,
-                    "TC Rappi": 370000,
-                    "TC Bancolombia": 1450000,
-                    "TC Banco de Bogotá": 0
-                },
-                transactions: [
-                    { id: "t1", desc: "Supermercado Inicial Octubre", amount: 210000, category: "Alimentación", account: "Bancolombia Ahorros", type: "gasto", date: "01 Oct" }
-                ]
-            }
-        };
+        // Compromisos Fijos reales suministrados
+        const initialFixedExpensesOct2026 = [
+            { id: "f1", name: "Crédito Bancolombia", amount: 1579781, paid: false, day: 5 },
+            { id: "f2", name: "Hipotecario Davivienda", amount: 1455664, paid: false, day: 10 },
+            { id: "f3", name: "Arriendo", amount: 1418850, paid: false, day: 1 },
+            { id: "f4", name: "Crédito Banco de Bogotá", amount: 423296, paid: false, day: 15 },
+            { id: "f5", name: "TC Rappi", amount: 460000, paid: false, day: 22 },
+            { id: "f6", name: "Admón Talauma", amount: 324700, paid: false, day: 10 },
+            { id: "f7", name: "Gata", amount: 160000, paid: false, day: 12 },
+            { id: "f8", name: "Internet Movistar", amount: 155490, paid: false, day: 18 },
+            { id: "f9", name: "TC Nu", amount: 90000, paid: false, day: 20 },
+            { id: "f10", name: "Luz", amount: 64300, paid: false, day: 15 },
+            { id: "f11", name: "Somos Internet", amount: 63000, paid: false, day: 15 },
+            { id: "f12", name: "Gasolina", amount: 60000, paid: false, day: 8 },
+            { id: "f13", name: "Parqueadero", amount: 60000, paid: false, day: 5 },
+            { id: "f14", name: "Agua", amount: 38580, paid: false, day: 15 },
+            { id: "f15", name: "TC Bancolombia", amount: 30900, paid: false, day: 25 },
+            { id: "f16", name: "Gas", amount: 10300, paid: false, day: 15 }
+        ];
 
+        // Catálogo de Suscripciones por defecto
         const defaultSubscriptions = [
             { id: "s1", name: "Mercado", amount: 650000, card: "TC Rappi" },
             { id: "s2", name: "Netflix", amount: 18900, card: "TC Nu" },
@@ -500,28 +572,55 @@
             { id: "s5", name: "Spotify", amount: 30500, card: "TC Nu" }
         ];
 
+        const defaultAppData = {
+            "2026-10": {
+                title: "Octubre 2026",
+                status: "En Curso",
+                incomeQ1: 2419850,
+                incomeQ2: 0,
+                fixedExpenses: initialFixedExpensesOct2026,
+                variableBudgets: {
+                    "Alimentación": 850000,
+                    "Transporte": 380000,
+                    "Entretenimiento": 250000,
+                    "Salud y Cuidado": 150000,
+                    "Otros Gastos": 200000
+                },
+                accounts: {
+                    "Banco de Bogotá": 2419850
+                },
+                credits: {
+                    "Crédito Bancolombia": 49509730,
+                    "Hipotecario Davivienda": 50025000,
+                    "Crédito Banco de Bogotá": 15857264,
+                    "TC Rappi": 5767228,
+                    "TC Nu": 1254000,
+                    "TC Bancolombia": 2100000
+                },
+                transactions: []
+            }
+        };
+
         // Cargar Estado desde LocalStorage o inicializar
-        let appData = JSON.parse(localStorage.getItem("kebo_finances_data")) || defaultAppData;
-        let subscriptionsCatalog = JSON.parse(localStorage.getItem("kebo_subscriptions")) || defaultSubscriptions;
+        let appData = JSON.parse(localStorage.getItem("kebo_finances_data_v2")) || defaultAppData;
+        let subscriptionsCatalog = JSON.parse(localStorage.getItem("kebo_subscriptions_v2")) || defaultSubscriptions;
 
         function saveToLocalStorage() {
-            localStorage.setItem("kebo_finances_data", JSON.stringify(appData));
-            localStorage.setItem("kebo_subscriptions", JSON.stringify(subscriptionsCatalog));
+            localStorage.setItem("kebo_finances_data_v2", JSON.stringify(appData));
+            localStorage.setItem("kebo_subscriptions_v2", JSON.stringify(subscriptionsCatalog));
         }
 
-        // Formatear Moneda Colombiana COP
         function formatCOP(num) {
             return "$" + Number(num || 0).toLocaleString("es-CO");
         }
 
-        // Sistema de Notificaciones Toast
         function showToast(message, type = "success") {
             const container = document.getElementById("toastContainer");
             const toast = document.createElement("div");
             toast.className = `toast-slide p-3 rounded-xl shadow-xl border text-xs font-semibold flex items-center gap-2 pointer-events-auto ${
-                type === "success" 
-                    ? "bg-slate-900 text-emerald-300 border-emerald-800/80" 
-                    : "bg-slate-900 text-rose-300 border-rose-800/80"
+                type === 'success' 
+                    ? 'bg-slate-900 text-emerald-300 border-emerald-800/80' 
+                    : 'bg-slate-900 text-rose-300 border-rose-800/80'
             }`;
             toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check text-emerald-400' : 'fa-triangle-exclamation text-rose-400'} text-sm"></i> <span>${message}</span>`;
             container.appendChild(toast);
@@ -531,7 +630,6 @@
             }, 3000);
         }
 
-        // Inicialización al cargar la ventana
         window.onload = function() {
             if (!appData[currentMonthKey]) {
                 const keys = Object.keys(appData);
@@ -547,13 +645,11 @@
             renderActiveSubscriptionsPreview();
         }
 
-        // Renderizar Encabezado y Mes Activo
         function renderHeader() {
             const monthObj = appData[currentMonthKey];
             document.getElementById("headerMonthTitle").innerText = monthObj ? monthObj.title : currentMonthKey;
         }
 
-        // Renderizar Tarjeta Resumen Global
         function renderSummaryCard() {
             const m = appData[currentMonthKey];
             if (!m) return;
@@ -565,7 +661,8 @@
             const totalBudget = totalFixedBudget + totalVariableBudget;
             document.getElementById("totalBudgetedText").innerText = formatCOP(totalBudget);
 
-            document.getElementById("totalIncomeText").innerText = formatCOP(m.income);
+            const totalIncome = (m.incomeQ1 || 0) + (m.incomeQ2 || 0);
+            document.getElementById("totalIncomeText").innerText = formatCOP(totalIncome);
 
             const totalSpent = m.transactions
                 .filter(t => t.type === 'gasto')
@@ -588,7 +685,6 @@
             document.getElementById("totalDebtBalanceDisplay").innerText = formatCOP(totalDebt);
         }
 
-        // Cambio de Pestañas
         function switchTab(tabId) {
             currentTab = tabId;
             const tabs = ['fijos', 'variables', 'deudas', 'historial'];
@@ -613,12 +709,12 @@
             if (currentTab === 'historial') renderTransactionsHistory();
         }
 
-        // RENDER 1: GASTOS FIJOS
+        // RENDER 1: GASTOS FIJOS REALES CON EDICIÓN
         function renderFixedExpenses() {
             const container = document.getElementById("fixedExpensesList");
             const m = appData[currentMonthKey];
             if (!m || !m.fixedExpenses.length) {
-                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-500 bg-slate-900 rounded-2xl border border-slate-800">No hay compromisos fijos registrados para este mes.</div>`;
+                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-500 bg-slate-900 rounded-2xl border border-slate-800">No hay compromisos fijos registrados.</div>`;
                 return;
             }
 
@@ -633,12 +729,13 @@
                             <span class="text-[10px] text-slate-400 block">Día límite: ${item.day} de cada mes</span>
                         </div>
                     </div>
-                    <div class="text-right flex items-center gap-3">
+                    <div class="text-right flex items-center gap-2">
                         <div>
                             <span class="text-xs font-extrabold ${item.paid ? 'text-slate-500' : 'text-purple-300'} block">${formatCOP(item.amount)}</span>
                             <span class="text-[9px] px-2 py-0.5 rounded-full ${item.paid ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">${item.paid ? 'Pagado' : 'Pendiente'}</span>
                         </div>
-                        <button onclick="deleteFixedExpense('${item.id}')" class="text-slate-600 hover:text-rose-400 p-1 transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                        <button onclick="openEditFixedModal('${item.id}')" title="Editar valor del recibo" class="text-slate-400 hover:text-purple-400 p-1.5 rounded-lg hover:bg-slate-800 transition"><i class="fa-solid fa-pen text-xs"></i></button>
+                        <button onclick="deleteFixedExpense('${item.id}')" title="Eliminar" class="text-slate-600 hover:text-rose-400 p-1 transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
                     </div>
                 </div>
             `).join('');
@@ -651,7 +748,7 @@
                 item.paid = !item.paid;
                 saveToLocalStorage();
                 renderAll();
-                showToast(item.paid ? `Marcado como pagado: ${item.name}` : `Marcado como pendiente`);
+                showToast(item.paid ? `Pagado: ${item.name}` : `Pendiente: ${item.name}`);
             }
         }
 
@@ -660,7 +757,7 @@
             m.fixedExpenses = m.fixedExpenses.filter(f => f.id !== id);
             saveToLocalStorage();
             renderAll();
-            showToast("Gasto fijo eliminado", "error");
+            showToast("Compromiso fijo eliminado", "error");
         }
 
         // RENDER 2: GASTOS VARIABLES
@@ -699,7 +796,7 @@
             }).join('');
         }
 
-        // RENDER 3: BANCOS Y TARJETAS
+        // RENDER 3: CUENTAS Y DEUDAS TOTALES
         function renderDebtsAndAccounts() {
             const m = appData[currentMonthKey];
             if (!m) return;
@@ -727,7 +824,7 @@
                             </div>
                             <div>
                                 <h4 class="text-xs font-bold text-white">${credName}</h4>
-                                <span class="text-[10px] text-slate-400">Saldo pendiente de pago</span>
+                                <span class="text-[10px] text-slate-400">Saldo pendiente total</span>
                             </div>
                         </div>
                         <div class="text-right">
@@ -738,12 +835,12 @@
             }).join('');
         }
 
-        // RENDER 4: HISTORIAL DE TRANSACCIONES
+        // RENDER 4: HISTORIAL
         function renderTransactionsHistory() {
             const container = document.getElementById("transactionsList");
             const m = appData[currentMonthKey];
             if (!m || !m.transactions.length) {
-                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-500 bg-slate-900 rounded-2xl border border-slate-800">No hay transacciones registradas este mes.</div>`;
+                container.innerHTML = `<div class="p-6 text-center text-xs text-slate-500 bg-slate-900 rounded-2xl border border-slate-800">No hay transacciones este mes.</div>`;
                 return;
             }
 
@@ -776,7 +873,6 @@
             showToast("Transacción eliminada", "error");
         }
 
-        // RENDER SUSCRIPCIONES PREVIEW
         function renderActiveSubscriptionsPreview() {
             const container = document.getElementById("activeSubscriptionsPreview");
             container.innerHTML = subscriptionsCatalog.map(sub => `
@@ -790,9 +886,35 @@
             `).join('');
         }
 
-        // CONTROL DE MODALES
+        // MODAL MANAGEMENT
         function openModal(id) { document.getElementById(id).classList.remove("hidden"); }
         function closeModal(id) { document.getElementById(id).classList.add("hidden"); }
+
+        function openIncomeModal() {
+            const m = appData[currentMonthKey];
+            document.getElementById("incomeQ1Input").value = m.incomeQ1 || 0;
+            document.getElementById("incomeQ2Input").value = m.incomeQ2 || 0;
+            openModal("modalIncome");
+        }
+
+        function handleSaveIncomes(e) {
+            e.preventDefault();
+            const q1 = parseFloat(document.getElementById("incomeQ1Input").value) || 0;
+            const q2 = parseFloat(document.getElementById("incomeQ2Input").value) || 0;
+
+            const m = appData[currentMonthKey];
+            const diffQ1 = q1 - (m.incomeQ1 || 0);
+            const diffQ2 = q2 - (m.incomeQ2 || 0);
+
+            m.incomeQ1 = q1;
+            m.incomeQ2 = q2;
+            m.accounts["Banco de Bogotá"] = (m.accounts["Banco de Bogotá"] || 0) + diffQ1 + diffQ2;
+
+            saveToLocalStorage();
+            closeModal("modalIncome");
+            renderAll();
+            showToast("Ingresos de quincenas actualizados con éxito");
+        }
 
         function openSubscriptionsModal() {
             const container = document.getElementById("subscriptionsCatalogList");
@@ -819,7 +941,7 @@
             renderActiveSubscriptionsPreview();
             closeModal("modalSubscriptions");
             document.getElementById("formAddSubscription").reset();
-            showToast("Suscripción agregada correctamente");
+            showToast("Suscripción agregada al catálogo");
         }
 
         function deleteSubscription(id) {
@@ -828,6 +950,67 @@
             renderActiveSubscriptionsPreview();
             openSubscriptionsModal();
             showToast("Suscripción eliminada", "error");
+        }
+
+        function openEditFixedModal(id) {
+            const m = appData[currentMonthKey];
+            const item = m.fixedExpenses.find(f => f.id === id);
+            if (!item) return;
+
+            document.getElementById("editFixedId").value = item.id;
+            document.getElementById("editFixedName").value = item.name;
+            document.getElementById("editFixedAmount").value = item.amount;
+            document.getElementById("editFixedDay").value = item.day;
+            openModal("modalEditFixed");
+        }
+
+        function handleSaveEditFixed(e) {
+            e.preventDefault();
+            const id = document.getElementById("editFixedId").value;
+            const name = document.getElementById("editFixedName").value;
+            const amount = parseFloat(document.getElementById("editFixedAmount").value);
+            const day = parseInt(document.getElementById("editFixedDay").value);
+
+            const m = appData[currentMonthKey];
+            const item = m.fixedExpenses.find(f => f.id === id);
+            if (item) {
+                item.name = name;
+                item.amount = amount;
+                item.day = day;
+            }
+
+            saveToLocalStorage();
+            closeModal("modalEditFixed");
+            renderAll();
+            showToast("Compromiso fijo actualizado correctamente");
+        }
+
+        function openEditDebtsModal() {
+            const container = document.getElementById("editDebtsInputsList");
+            const m = appData[currentMonthKey];
+            container.innerHTML = Object.entries(m.credits).map(([credName, val]) => `
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">${credName}</label>
+                    <input type="number" id="debt_${credName}" value="${val}" step="1000" required class="w-full p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                </div>
+            `).join('');
+            openModal("modalEditDebts");
+        }
+
+        function handleSaveEditDebts(e) {
+            e.preventDefault();
+            const m = appData[currentMonthKey];
+            Object.keys(m.credits).forEach(credName => {
+                const input = document.getElementById("debt_" + credName);
+                if (input) {
+                    m.credits[credName] = parseFloat(input.value) || 0;
+                }
+            });
+
+            saveToLocalStorage();
+            closeModal("modalEditDebts");
+            renderAll();
+            showToast("Saldos de deuda actualizados");
         }
 
         function openMonthSelectorModal() {
@@ -845,26 +1028,35 @@
             currentMonthKey = key;
             closeModal("modalMonthSelector");
             renderAll();
-            showToast(`Cambiado a mes: ${appData[key].title}`);
+            showToast(`Cambiado a: ${appData[key].title}`);
         }
 
         function createNewMonthPrompt() {
             const newKey = prompt("Ingrese clave del mes (Ej: 2026-11):", "2026-11");
             if (!newKey) return;
-            const title = prompt("Ingrese título legible del mes (Ej: Noviembre 2026):", "Noviembre 2026");
+            const title = prompt("Ingrese título legible (Ej: Noviembre 2026):", "Noviembre 2026");
             if (!title) return;
 
             const prevMonth = appData[currentMonthKey];
             const clonedFixed = prevMonth.fixedExpenses.map(f => ({ ...f, paid: false }));
 
+            // Automatizar suscripciones como pasivos/deuda en las TC correspondientes
+            const newCredits = { ...prevMonth.credits };
+            subscriptionsCatalog.forEach(sub => {
+                if (newCredits[sub.card] !== undefined) {
+                    newCredits[sub.card] += sub.amount;
+                }
+            });
+
             appData[newKey] = {
                 title: title,
                 status: "En Curso",
-                income: prevMonth.income,
+                incomeQ1: 0,
+                incomeQ2: 0,
                 fixedExpenses: clonedFixed,
                 variableBudgets: { ...prevMonth.variableBudgets },
-                accounts: { ...prevMonth.accounts },
-                credits: { ...prevMonth.credits },
+                accounts: { "Banco de Bogotá": prevMonth.accounts["Banco de Bogotá"] || 0 },
+                credits: newCredits,
                 transactions: []
             };
 
@@ -872,7 +1064,7 @@
             saveToLocalStorage();
             closeModal("modalMonthSelector");
             renderAll();
-            showToast(`¡Nuevo mes ${title} inicializado!`);
+            showToast(`¡Mes ${title} inicializado con suscripciones automáticas!`);
         }
 
         function openQuickExpenseModal() {
@@ -915,16 +1107,19 @@
             });
 
             if (currentTxTypeSelection === 'gasto') {
-                if (m.accounts[account] !== undefined) {
-                    m.accounts[account] = Math.max(0, m.accounts[account] - amount);
-                } else if (m.credits[account] !== undefined) {
-                    m.credits[account] += amount;
+                if (account.startsWith("TC ") || account.includes("Hipotecario") || account.includes("Crédito")) {
+                    if (m.credits[account] !== undefined) {
+                        m.credits[account] += amount;
+                    }
+                } else {
+                    if (m.accounts[account] !== undefined) {
+                        m.accounts[account] = Math.max(0, m.accounts[account] - amount);
+                    }
                 }
             } else {
                 if (m.accounts[account] !== undefined) {
                     m.accounts[account] += amount;
                 }
-                m.income += amount;
             }
 
             saveToLocalStorage();
