@@ -190,7 +190,7 @@
                     <h2 class="text-sm font-bold text-white flex items-center gap-1.5">
                         <i class="fa-solid fa-file-invoice-dollar text-purple-400"></i> Compromisos Fijos Reales
                     </h2>
-                    <p class="text-[11px] text-slate-400">Toca para marcar pagado o editar el valor del recibo</p>
+                    <p class="text-[11px] text-slate-400">Toca "Pagar" para registrar el egreso descontando de tu cuenta o TC</p>
                 </div>
                 <button onclick="openAddFixedModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30 font-medium px-3 py-1.5 rounded-xl transition flex items-center gap-1">
                     <i class="fa-solid fa-plus text-[10px]"></i> Agregar
@@ -276,9 +276,9 @@
     <!-- Bottom Quick Action Bar -->
     <div class="fixed bottom-0 left-0 right-0 bg-slate-950/90 backdrop-blur-md border-t border-slate-800/80 p-3 z-40">
         <div class="max-w-md mx-auto flex items-center justify-between gap-2">
-            <button onclick="openQuickExpenseModal()" class="flex-1 bg-purple-600 hover:bg-purple-700 active:scale-[0.98] text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 transition text-sm">
+            <button onclick="openQuickExpenseModal('gasto')" class="flex-1 bg-purple-600 hover:bg-purple-700 active:scale-[0.98] text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 transition text-sm">
                 <i class="fa-solid fa-bolt text-amber-300"></i>
-                <span>+ Registrar Movimiento (Gasto / Ingreso)</span>
+                <span>+ Registrar Movimiento / Transferencia</span>
             </button>
         </div>
     </div>
@@ -383,80 +383,49 @@
                     Actualizar Monto
                 </button>
             </form>
-        </div>
-    </div>
-
-    <!-- MODAL: EDITAR SALDOS DE CRÉDITOS Y TCs -->
-    <div id="modalEditDebts" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-white text-base flex items-center gap-2">
-                    <i class="fa-solid fa-building-columns text-rose-400"></i> Ajustar Saldos Totales de Deuda
-                </h3>
-                <button onclick="closeModal('modalEditDebts')" class="text-slate-400 hover:text-white p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <form onsubmit="handleSaveEditDebts(event)" class="space-y-3">
-                <div id="editDebtsInputsList" class="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1"></div>
-                <button type="submit" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow">
-                    Guardar Saldos Actualizados
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: SELECTOR E HISTÓRICO DE MESES -->
-    <div id="modalMonthSelector" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-white text-base flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-days text-purple-400"></i> Seleccionar Mes
-                </h3>
-                <button onclick="closeModal('modalMonthSelector')" class="text-slate-400 hover:text-white p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <div id="monthsHistoryList" class="space-y-2"></div>
-            <div class="pt-2 border-t border-slate-800">
-                <button onclick="createNewMonthPrompt()" class="w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-plus"></i> Inicializar Siguiente Mes
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: REGISTRAR MOVIMIENTO RÁPIDO -->
+    <!-- MODAL: REGISTRAR MOVIMIENTO RÁPIDO (ESTILO KEBBO) -->
     <div id="modalQuickExpense" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[85vh] overflow-y-auto shadow-2xl">
-            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="font-bold text-white text-base flex items-center gap-2">
-                    <i class="fa-solid fa-bolt text-amber-300"></i> Registrar Movimiento
-                </h3>
-                <button onclick="closeModal('modalQuickExpense')" class="text-slate-400 hover:text-white p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+            <!-- Pestañas Superiores de Tipo (Estilo Kebbo) -->
+            <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800">
+                <button type="button" id="tabTypeGasto" onclick="switchTxModalType('gasto')" class="flex-1 py-2 text-xs font-bold rounded-lg transition bg-purple-600 text-white shadow">Gasto</button>
+                <button type="button" id="tabTypeIngreso" onclick="switchTxModalType('ingreso')" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white">Ingreso</button>
+                <button type="button" id="tabTypeTrans" onclick="switchTxModalType('transferencia')" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white">Transferencia</button>
             </div>
+
+            <!-- Pantalla de Monto Grande -->
+            <div class="text-center py-2 bg-slate-950/50 rounded-2xl border border-slate-800/80">
+                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Monto en COP</span>
+                <input type="number" id="txAmount" placeholder="0" required step="100" class="w-full bg-transparent text-center text-3xl font-black text-white focus:outline-none placeholder:text-slate-700">
+            </div>
+
             <form onsubmit="handleQuickTransaction(event)" class="space-y-3">
+                <!-- Nota o Descripción -->
                 <div>
-                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Tipo de Movimiento</label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button type="button" id="typeGastoBtn" onclick="setTxType('gasto')" class="py-2 rounded-xl text-xs font-bold bg-rose-600 text-white transition">Gasto Variable / TC</button>
-                        <button type="button" id="typeIngresoBtn" onclick="setTxType('ingreso')" class="py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 transition">Ingreso</button>
-                    </div>
+                    <input type="text" id="txDesc" placeholder="Nota o descripción (Ej: Supermercado, Quincena...)" required class="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder:text-slate-600">
                 </div>
-                <div>
-                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Descripción</label>
-                    <input type="text" id="txDesc" placeholder="Ej: Supermercado o Cena" required class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
+
+                <!-- Selector de Cuenta Origen / Destino -->
+                <div class="grid grid-cols-2 gap-2" id="accountSelectorsContainer">
                     <div>
-                        <label class="text-[11px] font-bold text-slate-400 block mb-1">Monto (COP)</label>
-                        <input type="number" id="txAmount" placeholder="Ej: 45000" required step="100" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                        <label id="labelAccountSource" class="text-[10px] font-bold text-slate-400 block mb-1">Cuenta de Origen / Pago</label>
+                        <select id="txAccountSource" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
+                            <option value="Banco de Bogotá">Banco de Bogotá (Débito)</option>
+                            <option value="TC Nu">TC Nu Bank</option>
+                            <option value="TC Rappi">TC Rappi</option>
+                            <option value="TC Bancolombia">TC Bancolombia</option>
+                            <option value="TC Banco de Bogotá">TC Banco de Bogotá (Crédito)</option>
+                        </select>
                     </div>
-                    <div>
-                        <label class="text-[11px] font-bold text-slate-400 block mb-1">Categoría Variable</label>
-                        <select id="txCategory" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                    <div id="divAccountDest" class="hidden">
+                        <label class="text-[10px] font-bold text-slate-400 block mb-1">Cuenta de Destino</label>
+                        <select id="txAccountDest" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
+                            <option value="Banco de Bogotá">Banco de Bogotá (Débito)</option>
+                        </select>
+                    </div>
+                    <div id="divCategorySelect">
+                        <label class="text-[10px] font-bold text-slate-400 block mb-1">Categoría</label>
+                        <select id="txCategory" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
                             <option value="Alimentación">Alimentación</option>
                             <option value="Transporte">Transporte</option>
                             <option value="Entretenimiento">Entretenimiento</option>
@@ -465,20 +434,51 @@
                         </select>
                     </div>
                 </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeModal('modalQuickExpense')" class="w-1/3 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs">Cancelar</button>
+                    <button type="submit" class="w-2/3 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-purple-600/30 flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Guardar Movimiento</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: PAGAR COMPROMISO FIJO (PARCIAL O TOTAL) -->
+    <div id="modalPayFixed" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i class="fa-solid fa-wallet text-emerald-400"></i> Pagar Compromiso Fijo
+                </h3>
+                <button onclick="closeModal('modalPayFixed')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="handleConfirmPayFixed(event)" class="space-y-3">
+                <input type="hidden" id="payFixedId">
                 <div>
-                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Método de Pago / Cuenta afectada</label>
-                    <select id="txAccount" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Compromiso</span>
+                    <h4 id="payFixedTitleName" class="text-sm font-extrabold text-white">--</h4>
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">Monto a Pagar (Total o Parcial en COP)</label>
+                    <input type="number" id="payFixedAmountInput" required step="100" class="w-full p-3 bg-slate-950 border border-slate-700 rounded-xl text-base font-black text-emerald-400">
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">¿De qué cuenta sale el dinero?</label>
+                    <select id="payFixedAccount" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
                         <option value="Banco de Bogotá">Banco de Bogotá (Débito)</option>
                         <option value="TC Nu">TC Nu Bank</option>
                         <option value="TC Rappi">TC Rappi</option>
                         <option value="TC Bancolombia">TC Bancolombia</option>
                         <option value="TC Banco de Bogotá">TC Banco de Bogotá (Crédito)</option>
-                        <option value="Hipotecario Davivienda">Hipotecario Davivienda</option>
                     </select>
-                    <p class="text-[10px] text-purple-300 mt-1">Si pagas con TC, reduce tu presupuesto variable y suma a la deuda de la tarjeta seleccionada (Cero doble conteo).</p>
                 </div>
-                <button type="submit" class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-xs shadow-lg shadow-purple-600/30">
-                    Guardar Transacción
+                <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-lg">
+                    Confirmar Pago y Descontar Saldo
                 </button>
             </form>
         </div>
@@ -667,20 +667,24 @@
             const totalSpent = m.transactions
                 .filter(t => t.type === 'gasto')
                 .reduce((acc, t) => acc + t.amount, 0);
+            
             document.getElementById("totalSpentText").innerText = formatCOP(totalSpent);
+            
+            const totalPct = totalBudget > 0 ? Math.min(Math.round((totalSpent / totalBudget) * 100), 100) : 0;
+            document.getElementById("totalPctText").innerText = totalPct + "%";
+            document.getElementById("totalProgressBar").style.width = totalPct + "%";
 
-            const pct = totalBudget > 0 ? Math.min(Math.round((totalSpent / totalBudget) * 100), 100) : 0;
-            document.getElementById("totalPctText").innerText = pct + "%";
-            document.getElementById("totalProgressBar").style.width = pct + "%";
-
+            // Fixed expenses pending
             const fixedPending = m.fixedExpenses
-                .filter(f => !f.paid)
-                .reduce((acc, f) => acc + f.amount, 0);
+                .filter(item => !item.paid)
+                .reduce((acc, item) => acc + item.amount, 0);
             document.getElementById("fixedPendingText").innerText = formatCOP(fixedPending);
 
+            // Total cash available
             const totalCash = Object.values(m.accounts).reduce((acc, val) => acc + val, 0);
             document.getElementById("totalCashAvailableText").innerText = formatCOP(totalCash);
 
+            // Total debt balance (sum of all credit accounts and loans)
             const totalDebt = Object.values(m.credits).reduce((acc, val) => acc + val, 0);
             document.getElementById("totalDebtBalanceDisplay").innerText = formatCOP(totalDebt);
         }
@@ -691,12 +695,14 @@
             tabs.forEach(t => {
                 const el = document.getElementById("tab" + t.charAt(0).toUpperCase() + t.slice(1));
                 const btn = document.getElementById("tabBtn" + t.charAt(0).toUpperCase() + t.slice(1));
-                if (t === tabId) {
-                    el.classList.remove("hidden");
-                    btn.className = "flex-1 py-2 rounded-lg transition-all font-bold bg-purple-600 text-white shadow flex items-center justify-center gap-1";
-                } else {
-                    el.classList.add("hidden");
-                    btn.className = "flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1 hover:text-white text-slate-400";
+                if (el && btn) {
+                    if (t === tabId) {
+                        el.classList.remove("hidden");
+                        btn.className = "flex-1 py-2 rounded-lg transition-all font-bold bg-purple-600 text-white shadow flex items-center justify-center gap-1";
+                    } else {
+                        el.classList.add("hidden");
+                        btn.className = "flex-1 py-2 rounded-lg transition-all flex items-center justify-center gap-1 text-slate-400 hover:text-white";
+                    }
                 }
             });
             renderTabContent();
@@ -704,12 +710,12 @@
 
         function renderTabContent() {
             if (currentTab === 'fijos') renderFixedExpenses();
-            if (currentTab === 'variables') renderVariableCategories();
-            if (currentTab === 'deudas') renderDebtsAndAccounts();
-            if (currentTab === 'historial') renderTransactionsHistory();
+            else if (currentTab === 'variables') renderVariableCategories();
+            else if (currentTab === 'deudas') renderDebtsAndAccounts();
+            else if (currentTab === 'historial') renderTransactionsHistory();
         }
 
-        // RENDER 1: GASTOS FIJOS REALES CON EDICIÓN
+        // RENDER 1: GASTOS FIJOS REALES CON EDICIÓN Y PAGO DIRECTO DESDE CUENTA
         function renderFixedExpenses() {
             const container = document.getElementById("fixedExpensesList");
             const m = appData[currentMonthKey];
@@ -721,35 +727,77 @@
             container.innerHTML = m.fixedExpenses.map(item => `
                 <div class="bg-slate-900 p-3.5 rounded-2xl border ${item.paid ? 'border-emerald-900/50 bg-slate-900/80' : 'border-slate-800'} flex items-center justify-between shadow-md transition">
                     <div class="flex items-center gap-3">
-                        <button onclick="toggleFixedPaid('${item.id}')" class="w-8 h-8 rounded-xl flex items-center justify-center transition ${item.paid ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40' : 'bg-slate-800 text-slate-500 hover:text-white border border-slate-700'}">
-                            <i class="fa-solid ${item.paid ? 'fa-check text-xs' : 'fa-circle text-[8px]' }"></i>
+                        <button onclick="openPayFixedModal('${item.id}')" class="w-9 h-9 rounded-xl flex items-center justify-center transition ${item.paid ? 'bg-emerald-600 text-white shadow-md shadow-emerald-900/40' : 'bg-slate-800 text-slate-400 hover:text-white border border-slate-700'}" title="Registrar pago (Total o Parcial)">
+                            <i class="fa-solid ${item.paid ? 'fa-check text-xs' : 'fa-wallet text-xs' }"></i>
                         </button>
                         <div>
-                            <h4 class="text-xs font-bold ${item.paid ? 'text-slate-400 line-through' : 'text-white'}">${item.name}</h4>
-                            <span class="text-[10px] text-slate-400 block">Día límite: ${item.day} de cada mes</span>
+                            <h4 class="text-xs font-bold ${item.paid ? 'text-slate-400' : 'text-white'}">${item.name}</h4>
+                            <span class="text-[10px] text-slate-400 block">Día límite: ${item.day} • ${item.paidAccount || 'Pendiente'}</span>
                         </div>
                     </div>
                     <div class="text-right flex items-center gap-2">
                         <div>
-                            <span class="text-xs font-extrabold ${item.paid ? 'text-slate-500' : 'text-purple-300'} block">${formatCOP(item.amount)}</span>
+                            <span class="text-xs font-extrabold ${item.paid ? 'text-slate-400' : 'text-purple-300'} block">${formatCOP(item.amount)}</span>
                             <span class="text-[9px] px-2 py-0.5 rounded-full ${item.paid ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">${item.paid ? 'Pagado' : 'Pendiente'}</span>
                         </div>
-                        <button onclick="openEditFixedModal('${item.id}')" title="Editar valor del recibo" class="text-slate-400 hover:text-purple-400 p-1.5 rounded-lg hover:bg-slate-800 transition"><i class="fa-solid fa-pen text-xs"></i></button>
-                        <button onclick="deleteFixedExpense('${item.id}')" title="Eliminar" class="text-slate-600 hover:text-rose-400 p-1 transition"><i class="fa-solid fa-trash-can text-xs"></i></button>
+                        <button onclick="openEditFixedModal('${item.id}')" title="Editar" class="text-slate-400 hover:text-purple-400 p-1 rounded-lg"><i class="fa-solid fa-pen text-xs"></i></button>
+                        <button onclick="deleteFixedExpense('${item.id}')" title="Eliminar" class="text-slate-600 hover:text-rose-400 p-1"><i class="fa-solid fa-trash-can text-xs"></i></button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function toggleFixedPaid(id) {
+        function openPayFixedModal(id) {
             const m = appData[currentMonthKey];
             const item = m.fixedExpenses.find(f => f.id === id);
-            if (item) {
-                item.paid = !item.paid;
-                saveToLocalStorage();
-                renderAll();
-                showToast(item.paid ? `Pagado: ${item.name}` : `Pendiente: ${item.name}`);
+            if (!item) return;
+
+            document.getElementById("payFixedId").value = item.id;
+            document.getElementById("payFixedTitleName").innerText = item.name;
+            document.getElementById("payFixedAmountInput").value = item.amount;
+            openModal("modalPayFixed");
+        }
+
+        function handleConfirmPayFixed(e) {
+            e.preventDefault();
+            const id = document.getElementById("payFixedId").value;
+            const paidAmount = parseFloat(document.getElementById("payFixedAmountInput").value);
+            const account = document.getElementById("payFixedAccount").value;
+
+            const m = appData[currentMonthKey];
+            const item = m.fixedExpenses.find(f => f.id === id);
+            if (!item) return;
+
+            item.paid = true;
+            item.paidAmount = paidAmount;
+            item.paidAccount = account;
+
+            // Registrar transacción automática en el historial
+            m.transactions.push({
+                id: "t_" + Date.now(),
+                desc: `Pago Fijo: ${item.name}`,
+                amount: paidAmount,
+                category: "Compromisos Fijos",
+                account: account,
+                type: 'gasto',
+                date: new Date().getDate() + " " + ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"][new Date().getMonth()]
+            });
+
+            // Descontar de cuenta o sumar a deuda de TC
+            if (account.startsWith("TC ") || account.includes("Crédito") || account.includes("Hipotecario")) {
+                if (m.credits[account] !== undefined) {
+                    m.credits[account] += paidAmount;
+                }
+            } else {
+                if (m.accounts[account] !== undefined) {
+                    m.accounts[account] = Math.max(0, m.accounts[account] - paidAmount);
+                }
             }
+
+            saveToLocalStorage();
+            closeModal("modalPayFixed");
+            renderAll();
+            showToast(`¡Pago de ${item.name} registrado exitosamente desde ${account}!`);
         }
 
         function deleteFixedExpense(id) {
@@ -758,6 +806,88 @@
             saveToLocalStorage();
             renderAll();
             showToast("Compromiso fijo eliminado", "error");
+        }
+
+        let currentTxModalTypeSelection = "gasto";
+
+        function switchTxModalType(type) {
+            currentTxModalTypeSelection = type;
+            const gBtn = document.getElementById("tabTypeGasto");
+            const iBtn = document.getElementById("tabTypeIngreso");
+            const tBtn = document.getElementById("tabTypeTrans");
+            const divDest = document.getElementById("divAccountDest");
+            const divCat = document.getElementById("divCategorySelect");
+            const lblSource = document.getElementById("labelAccountSource");
+
+            if (gBtn) gBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white";
+            if (iBtn) iBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white";
+            if (tBtn) tBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white";
+
+            if (type === 'gasto') {
+                if (gBtn) gBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition bg-purple-600 text-white shadow";
+                if (divDest) divDest.classList.add("hidden");
+                if (divCat) divCat.classList.remove("hidden");
+                if (lblSource) lblSource.innerText = "Cuenta de Pago / Origen";
+            } else if (type === 'ingreso') {
+                if (iBtn) iBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition bg-emerald-600 text-white shadow";
+                if (divDest) divDest.classList.add("hidden");
+                if (divCat) divCat.classList.remove("hidden");
+                if (lblSource) lblSource.innerText = "Cuenta Destino del Ingreso";
+            } else if (type === 'transferencia') {
+                if (tBtn) tBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition bg-blue-600 text-white shadow";
+                if (divDest) divDest.classList.remove("hidden");
+                if (divCat) divCat.classList.add("hidden");
+                if (lblSource) lblSource.innerText = "Cuenta Origen";
+            }
+        }
+
+        function openQuickExpenseModal(type = 'gasto') {
+            switchTxModalType(type);
+            const amtInput = document.getElementById("txAmount");
+            const descInput = document.getElementById("txDesc");
+            if (amtInput) amtInput.value = "";
+            if (descInput) descInput.value = "";
+            openModal("modalQuickExpense");
+        }
+
+        function handleQuickTransaction(e) {
+            e.preventDefault();
+            const amount = parseFloat(document.getElementById("txAmount").value) || 0;
+            const desc = document.getElementById("txDesc").value || (currentTxModalTypeSelection === 'transferencia' ? 'Transferencia' : 'Movimiento');
+            const sourceAcc = document.getElementById("txAccountSource").value;
+            const destAcc = document.getElementById("txAccountDest") ? document.getElementById("txAccountDest").value : "Banco de Bogotá";
+            const categoryEl = document.getElementById("txCategory");
+            const category = categoryEl ? categoryEl.value : "Transferencias";
+
+            const now = new Date();
+            const dateStr = now.getDate() + " " + ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"][now.getMonth()];
+
+            const m = appData[currentMonthKey];
+
+            if (currentTxModalTypeSelection === 'gasto') {
+                m.transactions.push({ id: "t_" + Date.now(), desc, amount, category, account: sourceAcc, type: 'gasto', date: dateStr });
+                if (sourceAcc.startsWith("TC ") || sourceAcc.includes("Crédito") || sourceAcc.includes("Hipotecario")) {
+                    if (m.credits[sourceAcc] !== undefined) m.credits[sourceAcc] += amount;
+                } else {
+                    if (m.accounts[sourceAcc] !== undefined) m.accounts[sourceAcc] = Math.max(0, m.accounts[sourceAcc] - amount);
+                }
+            } else if (currentTxModalTypeSelection === 'ingreso') {
+                m.transactions.push({ id: "t_" + Date.now(), desc, amount, category, account: sourceAcc, type: 'ingreso', date: dateStr });
+                if (m.accounts[sourceAcc] !== undefined) m.accounts[sourceAcc] += amount;
+            } else if (currentTxModalTypeSelection === 'transferencia') {
+                if (sourceAcc === destAcc) {
+                    showToast("La cuenta origen y destino deben ser distintas", "error");
+                    return;
+                }
+                m.transactions.push({ id: "t_" + Date.now(), desc: `Traspaso: ${sourceAcc} ➔ ${destAcc}`, amount, category: "Transferencia", account: `${sourceAcc} a ${destAcc}`, type: 'gasto', date: dateStr });
+                if (m.accounts[sourceAcc] !== undefined) m.accounts[sourceAcc] = Math.max(0, m.accounts[sourceAcc] - amount);
+                if (m.accounts[destAcc] !== undefined) m.accounts[destAcc] += amount;
+            }
+
+            saveToLocalStorage();
+            closeModal("modalQuickExpense");
+            renderAll();
+            showToast("Movimiento registrado correctamente");
         }
 
         // RENDER 2: GASTOS VARIABLES
@@ -1015,12 +1145,14 @@
 
         function openMonthSelectorModal() {
             const container = document.getElementById("monthsHistoryList");
-            container.innerHTML = Object.entries(appData).map(([key, m]) => `
-                <button onclick="selectMonth('${key}')" class="w-full p-3 rounded-xl border ${key === currentMonthKey ? 'bg-purple-950/60 border-purple-800 text-purple-300' : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800'} flex items-center justify-between text-xs font-bold transition">
-                    <span>${m.title}</span>
-                    <span class="text-[10px] px-2 py-0.5 rounded bg-slate-900 border border-slate-700">${m.status}</span>
-                </button>
-            `).join('');
+            if (container) {
+                container.innerHTML = Object.entries(appData).map(([key, m]) => `
+                    <button onclick="selectMonth('${key}')" class="w-full p-3 rounded-xl border ${key === currentMonthKey ? 'bg-purple-950/60 border-purple-800 text-purple-300' : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800'} flex items-center justify-between text-xs font-bold transition">
+                        <span>${m.title}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-slate-900 border border-slate-700">${m.status}</span>
+                    </button>
+                `).join('');
+            }
             openModal("modalMonthSelector");
         }
 
@@ -1067,68 +1199,6 @@
             showToast(`¡Mes ${title} inicializado con suscripciones automáticas!`);
         }
 
-        function openQuickExpenseModal() {
-            setTxType('gasto');
-            openModal("modalQuickExpense");
-        }
-
-        function setTxType(type) {
-            currentTxTypeSelection = type;
-            const gBtn = document.getElementById("typeGastoBtn");
-            const iBtn = document.getElementById("typeIngresoBtn");
-            if (type === 'gasto') {
-                gBtn.className = "py-2 rounded-xl text-xs font-bold bg-rose-600 text-white transition";
-                iBtn.className = "py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 transition";
-            } else {
-                gBtn.className = "py-2 rounded-xl text-xs font-bold bg-slate-800 text-slate-400 transition";
-                iBtn.className = "py-2 rounded-xl text-xs font-bold bg-emerald-600 text-white transition";
-            }
-        }
-
-        function handleQuickTransaction(e) {
-            e.preventDefault();
-            const desc = document.getElementById("txDesc").value;
-            const amount = parseFloat(document.getElementById("txAmount").value);
-            const category = document.getElementById("txCategory").value;
-            const account = document.getElementById("txAccount").value;
-
-            const now = new Date();
-            const dateStr = now.getDate() + " " + ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"][now.getMonth()];
-
-            const m = appData[currentMonthKey];
-            m.transactions.push({
-                id: "t_" + Date.now(),
-                desc,
-                amount,
-                category,
-                account,
-                type: currentTxTypeSelection,
-                date: dateStr
-            });
-
-            if (currentTxTypeSelection === 'gasto') {
-                if (account.startsWith("TC ") || account.includes("Hipotecario") || account.includes("Crédito")) {
-                    if (m.credits[account] !== undefined) {
-                        m.credits[account] += amount;
-                    }
-                } else {
-                    if (m.accounts[account] !== undefined) {
-                        m.accounts[account] = Math.max(0, m.accounts[account] - amount);
-                    }
-                }
-            } else {
-                if (m.accounts[account] !== undefined) {
-                    m.accounts[account] += amount;
-                }
-            }
-
-            saveToLocalStorage();
-            closeModal("modalQuickExpense");
-            document.getElementById("modalQuickExpense").querySelector("form").reset();
-            renderAll();
-            showToast("Movimiento registrado con éxito");
-        }
-
         function openAddFixedModal() { openModal("modalAddFixed"); }
 
         function handleAddNewFixed(e) {
@@ -1148,7 +1218,8 @@
 
             saveToLocalStorage();
             closeModal("modalAddFixed");
-            document.getElementById("modalAddFixed").querySelector("form").reset();
+            const form = document.getElementById("modalAddFixed").querySelector("form");
+            if (form) form.reset();
             renderAll();
             showToast("Compromiso fijo agregado");
         }
@@ -1156,12 +1227,14 @@
         function openSetProjectionsModal() {
             const container = document.getElementById("projectionsFormInputs");
             const m = appData[currentMonthKey];
-            container.innerHTML = Object.entries(m.variableBudgets).map(([cat, val]) => `
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">${cat}</label>
-                    <input type="number" id="proj_${cat}" value="${val}" step="1000" required class="w-full p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
-                </div>
-            `).join('');
+            if (container) {
+                container.innerHTML = Object.entries(m.variableBudgets).map(([cat, val]) => `
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">${cat}</label>
+                        <input type="number" id="proj_${cat}" value="${val}" step="1000" required class="w-full p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                    </div>
+                `).join('');
+            }
             openModal("modalSetProjections");
         }
 
