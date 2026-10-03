@@ -305,11 +305,11 @@
             <form onsubmit="handleSaveIncomes(event)" class="space-y-3 pt-1">
                 <div>
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Primera Quincena (COP)</label>
-                    <input type="number" id="incomeQ1Input" placeholder="Ej: 2500000" required step="100" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                    <input type="number" id="incomeQ1Input" placeholder="Ej: 2500000" required step="any" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Segunda Quincena (COP)</label>
-                    <input type="number" id="incomeQ2Input" placeholder="Ej: 2500000" required step="100" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                    <input type="number" id="incomeQ2Input" placeholder="Ej: 2500000" required step="any" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">¿A qué cuenta ingresa?</label>
@@ -348,7 +348,7 @@
                 <h4 class="text-xs font-bold text-purple-300 uppercase tracking-wider">+ Nueva Suscripción</h4>
                 <div class="grid grid-cols-2 gap-2">
                     <input type="text" id="subNewName" placeholder="Ej: Disney+" required class="p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
-                    <input type="number" id="subNewAmount" placeholder="Monto COP" required step="100" class="p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                    <input type="number" id="subNewAmount" placeholder="Monto COP" required step="any" class="p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
                 </div>
                 <div>
                     <select id="subNewCard" class="w-full p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
@@ -385,7 +385,7 @@
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 block mb-1">Monto Real (COP)</label>
-                        <input type="number" id="editFixedAmount" required step="100" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                        <input type="number" id="editFixedAmount" required step="any" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
                     </div>
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 block mb-1">Día Límite</label>
@@ -470,7 +470,7 @@
             <!-- Pantalla de Monto Grande -->
             <div class="text-center py-2 bg-slate-950/50 rounded-2xl border border-slate-800/80">
                 <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Monto Total en COP</span>
-                <input type="number" id="txAmount" placeholder="0" required step="100" class="w-full bg-transparent text-center text-3xl font-black text-white focus:outline-none placeholder:text-slate-700">
+                <input type="number" id="txAmount" placeholder="0" required step="any" class="w-full bg-transparent text-center text-3xl font-black text-white focus:outline-none placeholder:text-slate-700">
             </div>
 
             <form onsubmit="handleQuickTransaction(event)" class="space-y-3">
@@ -570,7 +570,7 @@
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Monto a Pagar (Total o Parcial en COP)</label>
-                    <input type="number" id="payFixedAmountInput" required step="100" class="w-full p-3 bg-slate-950 border border-slate-700 rounded-xl text-base font-black text-emerald-400">
+                    <input type="number" id="payFixedAmountInput" required step="any" class="w-full p-3 bg-slate-950 border border-slate-700 rounded-xl text-base font-black text-emerald-400">
                 </div>
                 <div>
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">¿De qué cuenta sale el dinero?</label>
@@ -610,7 +610,7 @@
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 block mb-1">Monto (COP)</label>
-                        <input type="number" id="fixedNewAmount" placeholder="Ej: 150000" required step="100" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                        <input type="number" id="fixedNewAmount" placeholder="Ej: 150000" required step="any" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
                     </div>
                     <div>
                         <label class="text-[11px] font-bold text-slate-400 block mb-1">Día Límite Pago</label>
@@ -1491,7 +1491,7 @@
                 container.innerHTML = Object.entries(m.variableBudgets).map(([cat, val]) => `
                     <div>
                         <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">${cat}</label>
-                        <input type="number" id="proj_${cat}" value="${val}" step="1000" required class="w-full p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                        <input type="number" id="proj_${cat}" value="${val}" step="any" required class="w-full p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
                     </div>
                 `).join('');
             }
