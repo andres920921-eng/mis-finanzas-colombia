@@ -144,7 +144,7 @@
                     <span id="fixedPendingText" class="text-sm font-extrabold text-purple-200 block">$0</span>
                 </div>
                 <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
-                    <span class="text-[10px] font-bold text-slate-400 block uppercase">Efectivo Líquido (B. Bogotá)</span>
+                    <span class="text-[10px] font-bold text-slate-400 block uppercase">Efectivo Líquido Total</span>
                     <span id="totalCashAvailableText" class="text-sm font-bold text-emerald-400 block">$0</span>
                 </div>
             </div>
@@ -240,7 +240,12 @@
                     <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                         <i class="fa-solid fa-money-bill-transfer text-emerald-400"></i> Cuentas de Débito / Efectivo
                     </h3>
-                    <span id="liquidTotalBadge" class="text-xs font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded-lg border border-emerald-800">$0</span>
+                    <div class="flex items-center gap-2">
+                        <span id="liquidTotalBadge" class="text-xs font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded-lg border border-emerald-800">$0</span>
+                        <button onclick="openEditAccountsModal()" class="text-[11px] font-bold text-emerald-400 hover:underline">
+                            Editar
+                        </button>
+                    </div>
                 </div>
                 <div id="accountsBalancesList" class="grid grid-cols-2 gap-2"></div>
             </div>
@@ -295,7 +300,7 @@
                 </button>
             </div>
             <p class="text-xs text-slate-400 leading-relaxed">
-                Tu salario entra por dos quincenas. Ingresa los montos correspondientes para actualizar tus ingresos totales del mes y el saldo en tu cuenta principal de Banco de Bogotá.
+                Tu salario entra por dos quincenas. Ingresa los montos correspondientes para actualizar tus ingresos totales del mes y el saldo en tu cuenta principal de Davivienda o Banco de Bogotá.
             </p>
             <form onsubmit="handleSaveIncomes(event)" class="space-y-3 pt-1">
                 <div>
@@ -305,6 +310,14 @@
                 <div>
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">Segunda Quincena (COP)</label>
                     <input type="number" id="incomeQ2Input" placeholder="Ej: 2500000" required step="100" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                </div>
+                <div>
+                    <label class="text-[11px] font-bold text-slate-400 block mb-1">¿A qué cuenta ingresa?</label>
+                    <select id="incomeTargetAccount" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
+                        <option value="Davivienda">Davivienda (Principal)</option>
+                        <option value="Banco de Bogotá">Banco de Bogotá</option>
+                        <option value="Nequi">Nequi</option>
+                    </select>
                 </div>
                 <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-lg">
                     Guardar Quincenas e Ingresos
@@ -404,6 +417,26 @@
         </div>
     </div>
 
+    <!-- MODAL: EDITAR CUENTAS DÉBITO -->
+    <div id="modalEditAccounts" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-white text-base flex items-center gap-2">
+                    <i class="fa-solid fa-money-bill-transfer text-emerald-400"></i> Actualizar Saldos de Cuentas Débito
+                </h3>
+                <button onclick="closeModal('modalEditAccounts')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="handleSaveEditAccounts(event)" class="space-y-3">
+                <div id="editAccountsInputsList" class="space-y-2.5"></div>
+                <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow">
+                    Guardar Saldos Débito
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL: EDITAR SALDOS DE DEUDAS -->
     <div id="modalEditDebts" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-5 space-y-4 shadow-2xl max-h-[85vh] overflow-y-auto">
@@ -418,7 +451,7 @@
             <form onsubmit="handleSaveEditDebts(event)" class="space-y-3">
                 <div id="editDebtsInputsList" class="space-y-2.5"></div>
                 <button type="submit" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs shadow">
-                    Guardar Saldos
+                    Guardar Saldos de Deuda
                 </button>
             </form>
         </div>
@@ -478,7 +511,9 @@
                     <div>
                         <label id="labelAccountSource" class="text-[10px] font-bold text-slate-400 block mb-1">Medio de Pago / TC</label>
                         <select id="txAccountSource" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-                            <option value="Banco de Bogotá">Banco de Bogotá (Débito)</option>
+                            <option value="Davivienda">Davivienda (Principal)</option>
+                            <option value="Banco de Bogotá">Banco de Bogotá</option>
+                            <option value="Nequi">Nequi</option>
                             <option value="TC Nu">TC Nu Bank</option>
                             <option value="TC Rappi">TC Rappi</option>
                             <option value="TC Bancolombia">TC Bancolombia</option>
@@ -488,11 +523,13 @@
                     <div id="divAccountDest" class="hidden">
                         <label class="text-[10px] font-bold text-slate-400 block mb-1">Cuenta de Destino</label>
                         <select id="txAccountDest" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
-                            <option value="Banco de Bogotá">Banco de Bogotá (Débito)</option>
+                            <option value="Davivienda">Davivienda (Principal)</option>
+                            <option value="Banco de Bogotá">Banco de Bogotá</option>
+                            <option value="Nequi">Nequi</option>
                         </select>
                     </div>
                     <div id="divCategorySelect">
-                        <label class="text-[10px] font-bold text-slate-400 block mb-1">Categoría</label>
+                        <label id="labelCategoryTitle" class="text-[10px] font-bold text-slate-400 block mb-1">Categoría</label>
                         <select id="txCategory" class="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white">
                             <option value="Alimentación">Alimentación</option>
                             <option value="Transporte">Transporte</option>
@@ -538,7 +575,9 @@
                 <div>
                     <label class="text-[11px] font-bold text-slate-400 block mb-1">¿De qué cuenta sale el dinero?</label>
                     <select id="payFixedAccount" class="w-full p-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white">
-                        <option value="Banco de Bogotá">Banco de Bogotá (Débito)</option>
+                        <option value="Davivienda">Davivienda (Principal)</option>
+                        <option value="Banco de Bogotá">Banco de Bogotá</option>
+                        <option value="Nequi">Nequi</option>
                         <option value="TC Nu">TC Nu Bank</option>
                         <option value="TC Rappi">TC Rappi</option>
                         <option value="TC Bancolombia">TC Bancolombia</option>
@@ -609,7 +648,7 @@
         // Estado Global con Octubre 2026 configurado exactamente con tus datos reales
         let currentMonthKey = "2026-10";
         let currentTab = "fijos";
-        let currentTxTypeSelection = "gasto";
+        let currentTxModalTypeSelection = "gasto";
 
         // Compromisos Fijos reales suministrados
         const initialFixedExpensesOct2026 = [
@@ -655,7 +694,9 @@
                     "Otros Gastos": 200000
                 },
                 accounts: {
-                    "Banco de Bogotá": 2419850
+                    "Davivienda": 0,
+                    "Banco de Bogotá": 2419850,
+                    "Nequi": 0
                 },
                 credits: {
                     "Crédito Bancolombia": 49509730,
@@ -670,12 +711,12 @@
         };
 
         // Cargar Estado desde LocalStorage o inicializar
-        let appData = JSON.parse(localStorage.getItem("kebo_finances_data_v3")) || defaultAppData;
-        let subscriptionsCatalog = JSON.parse(localStorage.getItem("kebo_subscriptions_v3")) || defaultSubscriptions;
+        let appData = JSON.parse(localStorage.getItem("kebo_finances_data_v4")) || defaultAppData;
+        let subscriptionsCatalog = JSON.parse(localStorage.getItem("kebo_subscriptions_v4")) || defaultSubscriptions;
 
         function saveToLocalStorage() {
-            localStorage.setItem("kebo_finances_data_v3", JSON.stringify(appData));
-            localStorage.setItem("kebo_subscriptions_v3", JSON.stringify(subscriptionsCatalog));
+            localStorage.setItem("kebo_finances_data_v4", JSON.stringify(appData));
+            localStorage.setItem("kebo_subscriptions_v4", JSON.stringify(subscriptionsCatalog));
         }
 
         function formatCOP(num) {
@@ -703,6 +744,13 @@
                 const keys = Object.keys(appData);
                 currentMonthKey = keys[keys.length - 1];
             }
+            // Asegurar que existan Davivienda y Nequi en cuentas si vienen de versiones anteriores
+            Object.values(appData).forEach(m => {
+                if (!m.accounts) m.accounts = {};
+                if (m.accounts["Davivienda"] === undefined) m.accounts["Davivienda"] = 0;
+                if (m.accounts["Nequi"] === undefined) m.accounts["Nequi"] = 0;
+                if (m.accounts["Banco de Bogotá"] === undefined) m.accounts["Banco de Bogotá"] = 0;
+            });
             renderAll();
         };
 
@@ -883,6 +931,8 @@
             const divCat = document.getElementById("divCategorySelect");
             const divInst = document.getElementById("divInstallmentsConfig");
             const lblSource = document.getElementById("labelAccountSource");
+            const lblCategoryTitle = document.getElementById("labelCategoryTitle");
+            const catSelect = document.getElementById("txCategory");
 
             if (gBtn) gBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white";
             if (iBtn) iBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition text-slate-400 hover:text-white";
@@ -894,12 +944,30 @@
                 if (divCat) divCat.classList.remove("hidden");
                 if (divInst) divInst.classList.remove("hidden");
                 if (lblSource) lblSource.innerText = "Medio de Pago / TC";
+                if (lblCategoryTitle) lblCategoryTitle.innerText = "Categoría";
+                if (catSelect) {
+                    catSelect.innerHTML = `
+                        <option value="Alimentación">Alimentación</option>
+                        <option value="Transporte">Transporte</option>
+                        <option value="Entretenimiento">Entretenimiento</option>
+                        <option value="Salud y Cuidado">Salud y Cuidado</option>
+                        <option value="Otros Gastos">Otros Gastos</option>
+                    `;
+                }
             } else if (type === 'ingreso') {
                 if (iBtn) iBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition bg-emerald-600 text-white shadow";
                 if (divDest) divDest.classList.add("hidden");
                 if (divCat) divCat.classList.remove("hidden");
                 if (divInst) divInst.classList.add("hidden");
                 if (lblSource) lblSource.innerText = "Cuenta Destino del Ingreso";
+                if (lblCategoryTitle) lblCategoryTitle.innerText = "Categoría de Ingreso";
+                if (catSelect) {
+                    catSelect.innerHTML = `
+                        <option value="Familia">Familia</option>
+                        <option value="Pagos">Pagos</option>
+                        <option value="Desembolsos">Desembolsos</option>
+                    `;
+                }
             } else if (type === 'transferencia') {
                 if (tBtn) tBtn.className = "flex-1 py-2 text-xs font-bold rounded-lg transition bg-blue-600 text-white shadow";
                 if (divDest) divDest.classList.remove("hidden");
@@ -939,7 +1007,7 @@
             const amount = parseFloat(document.getElementById("txAmount").value) || 0;
             const desc = document.getElementById("txDesc").value || (currentTxModalTypeSelection === 'transferencia' ? 'Transferencia' : 'Movimiento');
             const sourceAcc = document.getElementById("txAccountSource").value;
-            const destAcc = document.getElementById("txAccountDest") ? document.getElementById("txAccountDest").value : "Banco de Bogotá";
+            const destAcc = document.getElementById("txAccountDest") ? document.getElementById("txAccountDest").value : "Davivienda";
             const categoryEl = document.getElementById("txCategory");
             const category = categoryEl ? categoryEl.value : "Transferencias";
             const installmentsCount = parseInt(document.getElementById("txInstallmentsCount") ? document.getElementById("txInstallmentsCount").value : 1) || 1;
@@ -980,7 +1048,6 @@
                         const monthNames = {"01":"Enero","02":"Febrero","03":"Marzo","04":"Abril","05":"Mayo","06":"Junio","07":"Julio","08":"Agosto","09":"Septiembre","10":"Octubre","11":"Noviembre","12":"Diciembre"};
                         
                         if (!appData[futureKey]) {
-                            // Si el mes futuro no existe, lo creamos basándonos en el mes anterior
                             appData[futureKey] = {
                                 title: `${monthNames[String(month).padStart(2, '0')]} ${year}`,
                                 status: "Próximo",
@@ -988,13 +1055,12 @@
                                 incomeQ2: 0,
                                 fixedExpenses: [],
                                 variableBudgets: { ...m.variableBudgets },
-                                accounts: { "Banco de Bogotá": m.accounts["Banco de Bogotá"] || 0 },
+                                accounts: { "Davivienda": 0, "Banco de Bogotá": 0, "Nequi": 0 },
                                 credits: { ...m.credits },
                                 transactions: []
                             };
                         }
 
-                        // Añadir la cuota como compromiso fijo en el mes futuro
                         appData[futureKey].fixedExpenses.push({
                             id: `f_inst_${Date.now()}_${i}`,
                             name: `${desc} (Cuota ${i}/${installmentsCount})`,
@@ -1004,7 +1070,6 @@
                         });
                     }
 
-                    // Registrar en el historial del mes actual
                     m.transactions.push({
                         id: "t_" + Date.now(),
                         desc: `Diferido TC: ${desc} (${installmentsCount} cuotas)`,
@@ -1018,7 +1083,6 @@
                     showToast(`¡Compra a ${installmentsCount} cuotas registrada! Total sumado a ${sourceAcc} y cuotas programadas.`);
 
                 } else {
-                    // GASTO CORRIENTE NORMAL (A 1 sola cuota o débito)
                     m.transactions.push({ id: "t_" + Date.now(), desc, amount, category, account: sourceAcc, type: 'gasto', date: dateStr });
                     if (sourceAcc.startsWith("TC ") || sourceAcc.includes("Crédito") || sourceAcc.includes("Hipotecario")) {
                         if (m.credits[sourceAcc] !== undefined) m.credits[sourceAcc] += amount;
@@ -1093,9 +1157,13 @@
             let totalLiquid = 0;
             accContainer.innerHTML = Object.entries(m.accounts).map(([accName, balance]) => {
                 totalLiquid += balance;
+                const isMain = accName === "Davivienda";
                 return `
-                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 flex flex-col justify-between shadow">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase truncate">${accName}</span>
+                    <div class="bg-slate-900 p-3 rounded-xl border ${isMain ? 'border-emerald-800/60 bg-emerald-950/20' : 'border-slate-800'} flex flex-col justify-between shadow">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase truncate">${accName}</span>
+                            ${isMain ? '<span class="text-[9px] bg-emerald-950 text-emerald-400 px-1.5 py-0.2 rounded border border-emerald-800">Principal</span>' : ''}
+                        </div>
                         <span class="text-sm font-extrabold text-emerald-400 mt-1">${formatCOP(balance)}</span>
                     </div>
                 `;
@@ -1115,8 +1183,9 @@
                                 <span class="text-[10px] text-slate-400">Saldo pendiente total</span>
                             </div>
                         </div>
-                        <div class="text-right">
+                        <div class="text-right flex items-center gap-2">
                             <span class="text-xs font-extrabold text-rose-300 block">${formatCOP(balance)}</span>
+                            <button onclick="openEditDebtsModal()" title="Editar Saldo" class="text-slate-400 hover:text-rose-400 p-1"><i class="fa-solid fa-pen text-xs"></i></button>
                         </div>
                     </div>
                 `;
@@ -1189,6 +1258,7 @@
             e.preventDefault();
             const q1 = parseFloat(document.getElementById("incomeQ1Input").value) || 0;
             const q2 = parseFloat(document.getElementById("incomeQ2Input").value) || 0;
+            const targetAcc = document.getElementById("incomeTargetAccount").value;
 
             const m = appData[currentMonthKey];
             const diffQ1 = q1 - (m.incomeQ1 || 0);
@@ -1196,12 +1266,16 @@
 
             m.incomeQ1 = q1;
             m.incomeQ2 = q2;
-            m.accounts["Banco de Bogotá"] = (m.accounts["Banco de Bogotá"] || 0) + diffQ1 + diffQ2;
+            if (m.accounts[targetAcc] !== undefined) {
+                m.accounts[targetAcc] += diffQ1 + diffQ2;
+            } else {
+                m.accounts[targetAcc] = diffQ1 + diffQ2;
+            }
 
             saveToLocalStorage();
             closeModal("modalIncome");
             renderAll();
-            showToast("Ingresos de quincenas actualizados con éxito");
+            showToast(`¡Ingresos de quincenas guardados en ${targetAcc}!`);
         }
 
         function openSubscriptionsModal() {
@@ -1271,6 +1345,34 @@
             closeModal("modalEditFixed");
             renderAll();
             showToast("Compromiso fijo actualizado correctamente");
+        }
+
+        function openEditAccountsModal() {
+            const container = document.getElementById("editAccountsInputsList");
+            const m = appData[currentMonthKey];
+            container.innerHTML = Object.entries(m.accounts).map(([accName, val]) => `
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">${accName}</label>
+                    <input type="number" id="acc_${accName}" value="${val}" step="1000" required class="w-full p-2 bg-slate-950 border border-slate-700 rounded-xl text-xs font-bold text-white">
+                </div>
+            `).join('');
+            openModal("modalEditAccounts");
+        }
+
+        function handleSaveEditAccounts(e) {
+            e.preventDefault();
+            const m = appData[currentMonthKey];
+            Object.keys(m.accounts).forEach(accName => {
+                const input = document.getElementById("acc_" + accName);
+                if (input) {
+                    m.accounts[accName] = parseFloat(input.value) || 0;
+                }
+            });
+
+            saveToLocalStorage();
+            closeModal("modalEditAccounts");
+            renderAll();
+            showToast("Saldos de cuentas de débito actualizados");
         }
 
         function openEditDebtsModal() {
@@ -1345,7 +1447,7 @@
                 incomeQ2: 0,
                 fixedExpenses: clonedFixed,
                 variableBudgets: { ...prevMonth.variableBudgets },
-                accounts: { "Banco de Bogotá": prevMonth.accounts["Banco de Bogotá"] || 0 },
+                accounts: { ...prevMonth.accounts },
                 credits: newCredits,
                 transactions: []
             };
