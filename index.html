@@ -750,6 +750,7 @@
                 if (m.accounts["Davivienda"] === undefined) m.accounts["Davivienda"] = 0;
                 if (m.accounts["Nequi"] === undefined) m.accounts["Nequi"] = 0;
                 if (m.accounts["Banco de Bogotá"] === undefined) m.accounts["Banco de Bogotá"] = 0;
+                if (!m.credits) m.credits = {}; if (m.credits["TC Banco de Bogotá"] === undefined) m.credits["TC Banco de Bogotá"] = 0;
             });
             renderAll();
         };
