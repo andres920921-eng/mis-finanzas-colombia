@@ -904,7 +904,7 @@
                 }
             } else {
                 if (m.accounts[account] !== undefined) {
-                    m.accounts[account] = Math.max(0, m.accounts[account] - paidAmount);
+                    m.accounts[account] = m.accounts[account] - paidAmount;
                 }
             }
 
@@ -1087,7 +1087,7 @@
                     if (sourceAcc.startsWith("TC ") || sourceAcc.includes("Crédito") || sourceAcc.includes("Hipotecario")) {
                         if (m.credits[sourceAcc] !== undefined) m.credits[sourceAcc] += amount;
                     } else {
-                        if (m.accounts[sourceAcc] !== undefined) m.accounts[sourceAcc] = Math.max(0, m.accounts[sourceAcc] - amount);
+                        if (m.accounts[sourceAcc] !== undefined) m.accounts[sourceAcc] = m.accounts[sourceAcc] - amount;
                     }
                     showToast("Movimiento registrado correctamente");
                 }
@@ -1102,7 +1102,7 @@
                     return;
                 }
                 m.transactions.push({ id: "t_" + Date.now(), desc: `Traspaso: ${sourceAcc} ➔ ${destAcc}`, amount, category: "Transferencia", account: `${sourceAcc} a ${destAcc}`, type: 'gasto', date: dateStr });
-                if (m.accounts[sourceAcc] !== undefined) m.accounts[sourceAcc] = Math.max(0, m.accounts[sourceAcc] - amount);
+                if (m.accounts[sourceAcc] !== undefined) m.accounts[sourceAcc] = m.accounts[sourceAcc] - amount;
                 if (m.accounts[destAcc] !== undefined) m.accounts[destAcc] += amount;
                 showToast("Transferencia realizada");
             }
